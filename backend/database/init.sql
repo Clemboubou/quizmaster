@@ -44,6 +44,17 @@ CREATE TABLE results (
     FOREIGN KEY (quiz_id) REFERENCES quizzes(id) ON DELETE CASCADE
 );
 
+-- Table answers (réponses détaillées)
+CREATE TABLE answers (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    result_id INT NOT NULL,
+    question_id INT NOT NULL,
+    user_answer VARCHAR(255) NOT NULL,
+    is_correct BOOLEAN NOT NULL,
+    FOREIGN KEY (result_id) REFERENCES results(id) ON DELETE CASCADE,
+    FOREIGN KEY (question_id) REFERENCES questions(id) ON DELETE CASCADE
+);
+
 -- Table payments
 CREATE TABLE payments (
     id INT AUTO_INCREMENT PRIMARY KEY,

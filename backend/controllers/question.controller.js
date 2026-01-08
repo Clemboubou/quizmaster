@@ -2,6 +2,44 @@ const pool = require('../config/database');
 const { successResponse, errorResponse } = require('../utils/responses');
 
 /**
+ * Recuperer les questions pour jouer (eleves)
+ * GET /api/questions/play/:quizId
+ */
+async function getQuestionsForPlay(req, res) {
+    try {
+        const { quizId } = req.params;
+
+        // Verifier que le quiz existe
+        const [quizzes] = await pool.query(
+            'SELECT * FROM quizzes WHERE id = ?',
+            [quizId]
+        );
+
+        if (quizzes.length === 0) {
+            return errorResponse(res, 'NOT_FOUND', 'Quiz non trouve', 404);
+        }
+
+        // Recuperer les questions
+        const [questions] = await pool.query(
+            'SELECT * FROM questions WHERE quiz_id = ?',
+            [quizId]
+        );
+
+        // Parser les options JSON pour chaque question
+        const parsedQuestions = questions.map(q => ({
+            ...q,
+            options: typeof q.options === 'string' ? JSON.parse(q.options) : q.options
+        }));
+
+        return successResponse(res, parsedQuestions);
+
+    } catch (error) {
+        console.error('Erreur getQuestionsForPlay:', error);
+        return errorResponse(res, 'INTERNAL_ERROR', 'Erreur lors de la recuperation des questions', 500);
+    }
+}
+
+/**
  * Recuperer toutes les questions d'un quiz
  * GET /api/questions/quiz/:quizId
  */
@@ -168,6 +206,7 @@ async function deleteQuestion(req, res) {
 }
 
 module.exports = {
+    getQuestionsForPlay,
     getQuestionsByQuiz,
     createQuestion,
     updateQuestion,

@@ -13,4 +13,7 @@ router.get('/me', authenticateToken, requireEleve, resultController.getMyResults
 // Route professeur pour voir les resultats d'un quiz
 router.get('/quiz/:quizId', authenticateToken, requireProf, resultController.getResultsByQuiz);
 
+// Route professeur pour voir les reponses detaillees d'un resultat
+router.get('/:resultId/answers', authenticateToken, requireProf, resultController.getResultAnswers);
+
 module.exports = router;
