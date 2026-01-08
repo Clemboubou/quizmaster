@@ -16,6 +16,9 @@ const selectedQuizId = ref(null)
 const selectedResult = ref(null)
 const resultAnswers = ref([])
 const loadingAnswers = ref(false)
+const showMyAnswers = ref(false)
+const selectedMyResult = ref(null)
+const myAnswers = ref([])
 
 const myResults = computed(() => quizStore.results)
 const quizResults = computed(() => quizStore.quizResults)
@@ -76,6 +79,26 @@ async function viewAnswers(result) {
 function backToResults() {
   selectedResult.value = null
   resultAnswers.value = []
+}
+
+// Pour les eleves - voir ses propres reponses
+async function viewMyAnswers(result) {
+  loadingAnswers.value = true
+  selectedMyResult.value = result
+  showMyAnswers.value = true
+  try {
+    myAnswers.value = await quizStore.fetchMyResultAnswers(result.id)
+  } catch (err) {
+    alert('Erreur lors du chargement des reponses')
+  } finally {
+    loadingAnswers.value = false
+  }
+}
+
+function closeMyAnswers() {
+  showMyAnswers.value = false
+  selectedMyResult.value = null
+  myAnswers.value = []
 }
 
 const canCreateQuiz = computed(() => {
@@ -154,7 +177,8 @@ const quizLimit = computed(() => authStore.isPremium ? 20 : 1)
         <div
           v-for="result in myResults"
           :key="result.id"
-          class="card"
+          @click="viewMyAnswers(result)"
+          class="card hover:bg-gray-50 cursor-pointer transition-colors"
         >
           <div class="flex justify-between items-center">
             <div>
@@ -163,13 +187,16 @@ const quizLimit = computed(() => authStore.isPremium ? 20 : 1)
                 {{ new Date(result.played_at).toLocaleDateString('fr-FR') }}
               </p>
             </div>
-            <div class="text-right">
-              <div class="text-2xl font-bold text-primary-600">
-                {{ result.score }} / {{ result.total_questions }}
+            <div class="flex items-center space-x-4">
+              <div class="text-right">
+                <div class="text-2xl font-bold text-primary-600">
+                  {{ result.score }} / {{ result.total_questions }}
+                </div>
+                <div class="text-sm text-gray-500">
+                  {{ Math.round((result.score / result.total_questions) * 100) }}%
+                </div>
               </div>
-              <div class="text-sm text-gray-500">
-                {{ Math.round((result.score / result.total_questions) * 100) }}%
-              </div>
+              <span class="text-gray-400">&rarr;</span>
             </div>
           </div>
         </div>
@@ -267,6 +294,77 @@ const quizLimit = computed(() => authStore.isPremium ? 20 : 1)
             </div>
           </div>
         </template>
+      </div>
+    </div>
+
+    <!-- Student Answers Modal -->
+    <div
+      v-if="showMyAnswers"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      @click.self="closeMyAnswers"
+    >
+      <div class="bg-white rounded-xl p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-semibold">
+            {{ selectedMyResult?.quiz_title }} - Mes reponses
+          </h3>
+          <button @click="closeMyAnswers" class="text-gray-500 hover:text-gray-700">
+            X
+          </button>
+        </div>
+
+        <!-- Score summary -->
+        <div v-if="selectedMyResult" class="bg-primary-50 rounded-lg p-4 mb-4 text-center">
+          <div class="text-3xl font-bold text-primary-600">
+            {{ selectedMyResult.score }} / {{ selectedMyResult.total_questions }}
+          </div>
+          <div class="text-sm text-primary-700">
+            {{ Math.round((selectedMyResult.score / selectedMyResult.total_questions) * 100) }}% de bonnes reponses
+          </div>
+        </div>
+
+        <!-- Loading -->
+        <div v-if="loadingAnswers" class="text-center py-8">
+          <p class="text-gray-500">Chargement des reponses...</p>
+        </div>
+
+        <!-- Answers -->
+        <div v-else class="space-y-4">
+          <div v-if="myAnswers.length === 0" class="text-center py-8">
+            <p class="text-gray-500">Aucune reponse enregistree</p>
+          </div>
+
+          <div
+            v-for="(answer, index) in myAnswers"
+            :key="answer.id"
+            class="p-4 rounded-lg"
+            :class="answer.is_correct ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'"
+          >
+            <div class="flex items-start justify-between mb-2">
+              <span class="text-sm font-medium text-gray-500">Question {{ index + 1 }}</span>
+              <span
+                :class="answer.is_correct ? 'text-green-600' : 'text-red-600'"
+                class="text-sm font-medium"
+              >
+                {{ answer.is_correct ? 'Correct' : 'Incorrect' }}
+              </span>
+            </div>
+            <p class="font-medium text-gray-900 mb-3">{{ answer.question_text }}</p>
+            <div class="space-y-1 text-sm">
+              <p>
+                <span class="text-gray-500">Votre reponse:</span>
+                <span :class="answer.is_correct ? 'text-green-700' : 'text-red-700'" class="ml-2 font-medium">
+                  {{ answer.user_answer }}
+                </span>
+              </p>
+              <p v-if="!answer.is_correct">
+                <span class="text-gray-500">Bonne reponse:</span>
+                <span class="text-green-700 ml-2 font-medium">{{ answer.correct_answer }}</span>
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>

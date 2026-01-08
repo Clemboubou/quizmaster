@@ -207,6 +207,20 @@ export const useQuizStore = defineStore('quiz', () => {
     }
   }
 
+  async function fetchMyResultAnswers(resultId) {
+    loading.value = true
+    error.value = null
+    try {
+      const response = await api.get(`/results/me/${resultId}/answers`)
+      return response.data.data
+    } catch (err) {
+      error.value = err.response?.data?.error?.message || 'Erreur lors du chargement'
+      throw err
+    } finally {
+      loading.value = false
+    }
+  }
+
   async function fetchMyResults() {
     loading.value = true
     error.value = null
@@ -261,6 +275,7 @@ export const useQuizStore = defineStore('quiz', () => {
     deleteQuestion,
     submitResult,
     fetchResultAnswers,
+    fetchMyResultAnswers,
     fetchMyResults,
     fetchQuizResults,
     clearCurrentQuiz

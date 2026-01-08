@@ -10,6 +10,9 @@ router.post('/', authenticateToken, requireEleve, resultController.createResult)
 // Route eleve pour voir ses propres resultats
 router.get('/me', authenticateToken, requireEleve, resultController.getMyResults);
 
+// Route eleve pour voir ses reponses detaillees
+router.get('/me/:resultId/answers', authenticateToken, requireEleve, resultController.getMyResultAnswers);
+
 // Route professeur pour voir les resultats d'un quiz
 router.get('/quiz/:quizId', authenticateToken, requireProf, resultController.getResultsByQuiz);
 
