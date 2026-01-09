@@ -1484,6 +1484,165 @@ npm run format   # Formate avec Prettier
 npm run format:check # Verifie le formatage
 ```
 
+### Deployer sur GitHub et tester le CI/CD
+
+Voici les etapes pour publier le projet sur GitHub et voir le pipeline CI/CD en action.
+
+#### Etape 1 : Creer un repository GitHub
+
+1. Aller sur https://github.com
+2. Cliquer sur **"New repository"** (bouton vert)
+3. Nommer le repository (ex: `quizmaster`)
+4. Laisser **Public** ou choisir **Private**
+5. **Ne pas** cocher "Add a README" (on en a deja un)
+6. Cliquer sur **"Create repository"**
+
+#### Etape 2 : Initialiser Git en local
+
+Ouvrir un terminal dans le dossier `quizmaster` :
+
+```bash
+cd C:\Users\Cleme\Desktop\Squeez\quizmaster
+
+# Initialiser le repository Git
+git init
+
+# Ajouter tous les fichiers
+git add .
+
+# Creer le premier commit
+git commit -m "Initial commit - QuizMaster avec CI/CD"
+```
+
+#### Etape 3 : Connecter a GitHub
+
+Copier l'URL du repository GitHub (ex: `https://github.com/ton-username/quizmaster.git`) puis :
+
+```bash
+# Ajouter le remote (remplacer par ton URL)
+git remote add origin https://github.com/ton-username/quizmaster.git
+
+# Renommer la branche en "main"
+git branch -M main
+
+# Pousser le code vers GitHub
+git push -u origin main
+```
+
+**Note** : Si c'est la premiere fois, GitHub te demandera de t'authentifier.
+
+#### Etape 4 : Voir le pipeline CI/CD
+
+1. Aller sur ton repository GitHub
+2. Cliquer sur l'onglet **"Actions"**
+3. Tu verras le workflow **"CI/CD Pipeline"** en cours d'execution
+
+```
+🟡 CI/CD Pipeline (running...)
+   ├── 🟡 Backend CI
+   └── 🟡 Frontend CI
+```
+
+Apres quelques minutes :
+
+```
+✅ CI/CD Pipeline (success)
+   ├── ✅ Backend CI (2m 30s)
+   └── ✅ Frontend CI (3m 15s)
+```
+
+#### Etape 5 : En cas d'echec
+
+Si le pipeline echoue (croix rouge), clique dessus pour voir les details :
+
+```
+❌ CI/CD Pipeline (failed)
+   ├── ✅ Backend CI
+   └── ❌ Frontend CI
+       └── ❌ Lint code (ESLint)
+           → Error: 'unused-var' is defined but never used
+```
+
+Pour corriger :
+1. Lire le message d'erreur
+2. Corriger le code en local
+3. Commit et push a nouveau :
+
+```bash
+git add .
+git commit -m "Fix: correction erreur ESLint"
+git push
+```
+
+Le pipeline se relancera automatiquement.
+
+#### Fichier .gitignore
+
+Avant de push, assure-toi d'avoir un fichier `.gitignore` a la racine pour ne pas envoyer les fichiers sensibles :
+
+```
+# Dependencies
+node_modules/
+
+# Environment variables (SECRETS!)
+.env
+
+# Build output
+dist/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Coverage
+coverage/
+```
+
+#### Conseils pour le workflow Git
+
+| Action | Commande |
+|--------|----------|
+| Voir le statut | `git status` |
+| Voir les modifications | `git diff` |
+| Ajouter un fichier | `git add fichier.js` |
+| Ajouter tout | `git add .` |
+| Creer un commit | `git commit -m "message"` |
+| Pousser vers GitHub | `git push` |
+| Recuperer les modifications | `git pull` |
+| Voir l'historique | `git log --oneline` |
+
+#### Bonnes pratiques de commit
+
+Utiliser des messages clairs et descriptifs :
+
+```bash
+# Bon
+git commit -m "feat: ajout validation email"
+git commit -m "fix: correction bug connexion"
+git commit -m "docs: mise a jour README"
+git commit -m "test: ajout tests QuizCard"
+
+# Mauvais
+git commit -m "update"
+git commit -m "fix"
+git commit -m "wip"
+```
+
+Prefixes courants :
+- `feat:` nouvelle fonctionnalite
+- `fix:` correction de bug
+- `docs:` documentation
+- `test:` ajout/modification de tests
+- `refactor:` refactorisation du code
+- `style:` formatage (pas de changement de logique)
+
 ---
 
 ## 11. Installation et lancement
