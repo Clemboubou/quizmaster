@@ -9,7 +9,7 @@ const route = useRoute()
 const quizStore = useQuizStore()
 
 const isEditing = computed(() => !!route.query.edit)
-const quizId = computed(() => route.query.edit ? parseInt(route.query.edit) : null)
+const quizId = computed(() => (route.query.edit ? parseInt(route.query.edit) : null))
 
 const title = ref('')
 const questions = ref([])
@@ -113,9 +113,7 @@ function cancelQuestionForm() {
       <h1 class="text-2xl font-bold text-gray-900">
         {{ isEditing ? 'Modifier le quiz' : 'Creer un quiz' }}
       </h1>
-      <router-link to="/dashboard" class="btn btn-secondary">
-        Retour
-      </router-link>
+      <router-link to="/dashboard" class="btn btn-secondary">Retour</router-link>
     </div>
 
     <!-- Loading -->
@@ -144,7 +142,7 @@ function cancelQuestionForm() {
             class="btn btn-primary"
             :class="{ 'opacity-50 cursor-not-allowed': !canSave || saving }"
           >
-            {{ saving ? 'Sauvegarde...' : (isEditing ? 'Mettre a jour' : 'Creer') }}
+            {{ saving ? 'Sauvegarde...' : isEditing ? 'Mettre a jour' : 'Creer' }}
           </button>
         </div>
 
@@ -154,9 +152,7 @@ function cancelQuestionForm() {
       <!-- Questions Section (only visible after quiz creation) -->
       <template v-if="isEditing && quizId">
         <div class="flex justify-between items-center mb-4">
-          <h2 class="text-lg font-semibold">
-            Questions ({{ questions.length }})
-          </h2>
+          <h2 class="text-lg font-semibold">Questions ({{ questions.length }})</h2>
           <button
             v-if="!showQuestionForm && questions.length > 0"
             @click="showQuestionForm = true"
@@ -185,11 +181,7 @@ function cancelQuestionForm() {
         </div>
 
         <div v-else-if="questions.length > 0" class="space-y-4">
-          <div
-            v-for="(question, index) in questions"
-            :key="question.id"
-            class="card"
-          >
+          <div v-for="(question, index) in questions" :key="question.id" class="card">
             <div class="flex justify-between items-start">
               <div class="flex-1">
                 <div class="flex items-center space-x-2 mb-2">
@@ -204,7 +196,9 @@ function cancelQuestionForm() {
 
                 <div class="mt-2 flex flex-wrap gap-2">
                   <span
-                    v-for="(option, i) in (typeof question.options === 'string' ? JSON.parse(question.options) : question.options)"
+                    v-for="(option, i) in typeof question.options === 'string'
+                      ? JSON.parse(question.options)
+                      : question.options"
                     :key="i"
                     :class="[
                       'px-2 py-1 rounded text-sm',
@@ -239,9 +233,7 @@ function cancelQuestionForm() {
 
       <!-- Message before quiz creation -->
       <div v-else class="card text-center py-8">
-        <p class="text-gray-500">
-          Creez d'abord le quiz pour pouvoir ajouter des questions
-        </p>
+        <p class="text-gray-500">Creez d'abord le quiz pour pouvoir ajouter des questions</p>
       </div>
     </template>
   </div>

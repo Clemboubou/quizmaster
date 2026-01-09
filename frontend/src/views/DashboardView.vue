@@ -106,7 +106,7 @@ const canCreateQuiz = computed(() => {
   return quizStore.quizzes.length < 1
 })
 
-const quizLimit = computed(() => authStore.isPremium ? 20 : 1)
+const quizLimit = computed(() => (authStore.isPremium ? 20 : 1))
 </script>
 
 <template>
@@ -148,9 +148,7 @@ const quizLimit = computed(() => authStore.isPremium ? 20 : 1)
     <template v-else-if="authStore.isProf">
       <div v-if="quizStore.quizzes.length === 0" class="text-center py-12">
         <p class="text-gray-500 mb-4">Vous n'avez pas encore cree de quiz</p>
-        <router-link to="/create-quiz" class="btn btn-primary">
-          Creer mon premier quiz
-        </router-link>
+        <router-link to="/create-quiz" class="btn btn-primary">Creer mon premier quiz</router-link>
       </div>
 
       <div v-else class="grid md:grid-cols-2 gap-6">
@@ -168,9 +166,7 @@ const quizLimit = computed(() => authStore.isPremium ? 20 : 1)
     <template v-else>
       <div v-if="myResults.length === 0" class="text-center py-12">
         <p class="text-gray-500 mb-4">Vous n'avez pas encore participe a un quiz</p>
-        <router-link to="/" class="btn btn-primary">
-          Rejoindre un quiz
-        </router-link>
+        <router-link to="/" class="btn btn-primary">Rejoindre un quiz</router-link>
       </div>
 
       <div v-else class="space-y-4">
@@ -221,12 +217,12 @@ const quizLimit = computed(() => authStore.isPremium ? 20 : 1)
               &larr;
             </button>
             <h3 class="text-lg font-semibold">
-              {{ selectedResult ? `Reponses de ${selectedResult.student_email}` : 'Resultats du quiz' }}
+              {{
+                selectedResult ? `Reponses de ${selectedResult.student_email}` : 'Resultats du quiz'
+              }}
             </h3>
           </div>
-          <button @click="closeResults" class="text-gray-500 hover:text-gray-700">
-            X
-          </button>
+          <button @click="closeResults" class="text-gray-500 hover:text-gray-700">X</button>
         </div>
 
         <!-- Loading answers -->
@@ -244,7 +240,11 @@ const quizLimit = computed(() => authStore.isPremium ? 20 : 1)
             v-for="(answer, index) in resultAnswers"
             :key="answer.id"
             class="p-4 rounded-lg"
-            :class="answer.is_correct ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'"
+            :class="
+              answer.is_correct
+                ? 'bg-green-50 border border-green-200'
+                : 'bg-red-50 border border-red-200'
+            "
           >
             <div class="flex items-start justify-between mb-2">
               <span class="text-sm font-medium text-gray-500">Question {{ index + 1 }}</span>
@@ -259,7 +259,10 @@ const quizLimit = computed(() => authStore.isPremium ? 20 : 1)
             <div class="space-y-1 text-sm">
               <p>
                 <span class="text-gray-500">Reponse donnee:</span>
-                <span :class="answer.is_correct ? 'text-green-700' : 'text-red-700'" class="ml-2 font-medium">
+                <span
+                  :class="answer.is_correct ? 'text-green-700' : 'text-red-700'"
+                  class="ml-2 font-medium"
+                >
                   {{ answer.user_answer }}
                 </span>
               </p>
@@ -286,9 +289,7 @@ const quizLimit = computed(() => authStore.isPremium ? 20 : 1)
             >
               <span class="text-gray-700">{{ result.student_email }}</span>
               <div class="flex items-center space-x-3">
-                <span class="font-semibold text-primary-600">
-                  {{ result.score }} pts
-                </span>
+                <span class="font-semibold text-primary-600">{{ result.score }} pts</span>
                 <span class="text-gray-400">&rarr;</span>
               </div>
             </div>
@@ -306,12 +307,8 @@ const quizLimit = computed(() => authStore.isPremium ? 20 : 1)
       <div class="bg-white rounded-xl p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
         <!-- Header -->
         <div class="flex justify-between items-center mb-4">
-          <h3 class="text-lg font-semibold">
-            {{ selectedMyResult?.quiz_title }} - Mes reponses
-          </h3>
-          <button @click="closeMyAnswers" class="text-gray-500 hover:text-gray-700">
-            X
-          </button>
+          <h3 class="text-lg font-semibold">{{ selectedMyResult?.quiz_title }} - Mes reponses</h3>
+          <button @click="closeMyAnswers" class="text-gray-500 hover:text-gray-700">X</button>
         </div>
 
         <!-- Score summary -->
@@ -320,7 +317,8 @@ const quizLimit = computed(() => authStore.isPremium ? 20 : 1)
             {{ selectedMyResult.score }} / {{ selectedMyResult.total_questions }}
           </div>
           <div class="text-sm text-primary-700">
-            {{ Math.round((selectedMyResult.score / selectedMyResult.total_questions) * 100) }}% de bonnes reponses
+            {{ Math.round((selectedMyResult.score / selectedMyResult.total_questions) * 100) }}% de
+            bonnes reponses
           </div>
         </div>
 
@@ -339,7 +337,11 @@ const quizLimit = computed(() => authStore.isPremium ? 20 : 1)
             v-for="(answer, index) in myAnswers"
             :key="answer.id"
             class="p-4 rounded-lg"
-            :class="answer.is_correct ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'"
+            :class="
+              answer.is_correct
+                ? 'bg-green-50 border border-green-200'
+                : 'bg-red-50 border border-red-200'
+            "
           >
             <div class="flex items-start justify-between mb-2">
               <span class="text-sm font-medium text-gray-500">Question {{ index + 1 }}</span>
@@ -354,7 +356,10 @@ const quizLimit = computed(() => authStore.isPremium ? 20 : 1)
             <div class="space-y-1 text-sm">
               <p>
                 <span class="text-gray-500">Votre reponse:</span>
-                <span :class="answer.is_correct ? 'text-green-700' : 'text-red-700'" class="ml-2 font-medium">
+                <span
+                  :class="answer.is_correct ? 'text-green-700' : 'text-red-700'"
+                  class="ml-2 font-medium"
+                >
                   {{ answer.user_answer }}
                 </span>
               </p>

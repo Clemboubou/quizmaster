@@ -14,7 +14,7 @@ const loading = ref(false)
 
 async function joinQuiz() {
   if (!accessCode.value.trim()) {
-    error.value = 'Veuillez entrer un code d\'acces'
+    error.value = "Veuillez entrer un code d'acces"
     return
   }
 
@@ -35,10 +35,13 @@ async function joinQuiz() {
 <template>
   <div class="min-h-[calc(100vh-4rem)] flex flex-col">
     <!-- Hero Section -->
-    <section class="flex-1 flex items-center justify-center bg-gradient-to-br from-primary-50 to-primary-100">
+    <section
+      class="flex-1 flex items-center justify-center bg-gradient-to-br from-primary-50 to-primary-100"
+    >
       <div class="max-w-4xl mx-auto px-4 py-16 text-center">
         <h1 class="text-5xl font-bold text-gray-900 mb-6">
-          Bienvenue sur <span class="text-primary-600">QuizMaster</span>
+          Bienvenue sur
+          <span class="text-primary-600">QuizMaster</span>
         </h1>
         <p class="text-xl text-gray-600 mb-12">
           Creez et partagez des quiz interactifs en quelques clics
@@ -47,9 +50,7 @@ async function joinQuiz() {
         <!-- Join Quiz Form -->
         <div class="max-w-md mx-auto">
           <div class="card">
-            <h2 class="text-lg font-semibold text-gray-900 mb-4">
-              Rejoindre un quiz
-            </h2>
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">Rejoindre un quiz</h2>
 
             <form @submit.prevent="joinQuiz" class="space-y-4">
               <div>
@@ -64,11 +65,7 @@ async function joinQuiz() {
 
               <p v-if="error" class="error-text">{{ error }}</p>
 
-              <button
-                type="submit"
-                :disabled="loading"
-                class="btn btn-primary w-full py-3"
-              >
+              <button type="submit" :disabled="loading" class="btn btn-primary w-full py-3">
                 {{ loading ? 'Chargement...' : 'Rejoindre' }}
               </button>
             </form>
@@ -77,12 +74,8 @@ async function joinQuiz() {
 
         <!-- CTA for professors -->
         <div class="mt-12" v-if="!authStore.isAuthenticated">
-          <p class="text-gray-600 mb-4">
-            Vous etes professeur ? Creez vos propres quiz !
-          </p>
-          <router-link to="/auth" class="btn btn-secondary">
-            Se connecter / S'inscrire
-          </router-link>
+          <p class="text-gray-600 mb-4">Vous etes professeur ? Creez vos propres quiz !</p>
+          <router-link to="/auth" class="btn btn-secondary">Se connecter / S'inscrire</router-link>
         </div>
       </div>
     </section>
@@ -98,25 +91,19 @@ async function joinQuiz() {
           <div class="text-center">
             <div class="text-4xl mb-4">&#x1F4DD;</div>
             <h3 class="text-lg font-semibold mb-2">Facile a creer</h3>
-            <p class="text-gray-600">
-              Creez des quiz QCM ou Vrai/Faux en quelques minutes
-            </p>
+            <p class="text-gray-600">Creez des quiz QCM ou Vrai/Faux en quelques minutes</p>
           </div>
 
           <div class="text-center">
             <div class="text-4xl mb-4">&#x1F517;</div>
             <h3 class="text-lg font-semibold mb-2">Partage simplifie</h3>
-            <p class="text-gray-600">
-              Un code a 5 caracteres suffit pour rejoindre un quiz
-            </p>
+            <p class="text-gray-600">Un code a 5 caracteres suffit pour rejoindre un quiz</p>
           </div>
 
           <div class="text-center">
             <div class="text-4xl mb-4">&#x1F4CA;</div>
             <h3 class="text-lg font-semibold mb-2">Resultats detailles</h3>
-            <p class="text-gray-600">
-              Suivez les performances de vos eleves en temps reel
-            </p>
+            <p class="text-gray-600">Suivez les performances de vos eleves en temps reel</p>
           </div>
         </div>
       </div>

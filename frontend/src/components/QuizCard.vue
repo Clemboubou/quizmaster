@@ -35,9 +35,7 @@ function copyCode() {
     <div class="flex justify-between items-start">
       <div>
         <h3 class="text-lg font-semibold text-gray-900">{{ quiz.title }}</h3>
-        <p class="text-sm text-gray-500 mt-1">
-          Cree le {{ formatDate(quiz.created_at) }}
-        </p>
+        <p class="text-sm text-gray-500 mt-1">Cree le {{ formatDate(quiz.created_at) }}</p>
       </div>
 
       <div class="flex items-center space-x-2">
@@ -54,33 +52,17 @@ function copyCode() {
       <span class="font-mono text-2xl font-bold text-primary-600">
         {{ quiz.access_code }}
       </span>
-      <button
-        @click="copyCode"
-        class="text-sm text-gray-600 hover:text-gray-800"
-      >
-        Copier
-      </button>
+      <button @click="copyCode" class="text-sm text-gray-600 hover:text-gray-800">Copier</button>
     </div>
 
     <div v-if="showActions" class="mt-4 flex space-x-2">
-      <router-link
-        :to="`/create-quiz?edit=${quiz.id}`"
-        class="btn btn-secondary text-sm"
-      >
+      <router-link :to="`/create-quiz?edit=${quiz.id}`" class="btn btn-secondary text-sm">
         Modifier
       </router-link>
-      <button
-        @click="emit('view-results', quiz.id)"
-        class="btn btn-secondary text-sm"
-      >
+      <button @click="emit('view-results', quiz.id)" class="btn btn-secondary text-sm">
         Resultats
       </button>
-      <button
-        @click="emit('delete', quiz.id)"
-        class="btn btn-danger text-sm"
-      >
-        Supprimer
-      </button>
+      <button @click="emit('delete', quiz.id)" class="btn btn-danger text-sm">Supprimer</button>
     </div>
   </div>
 </template>

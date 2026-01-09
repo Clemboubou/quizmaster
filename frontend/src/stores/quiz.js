@@ -186,7 +186,7 @@ export const useQuizStore = defineStore('quiz', () => {
       const response = await api.post('/results', { quiz_id: quizId, score, answers })
       return response.data.data
     } catch (err) {
-      error.value = err.response?.data?.error?.message || 'Erreur lors de l\'envoi'
+      error.value = err.response?.data?.error?.message || "Erreur lors de l'envoi"
       throw err
     } finally {
       loading.value = false

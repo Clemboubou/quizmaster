@@ -46,9 +46,7 @@ const emoji = computed(() => {
     <p v-if="quizTitle" class="text-gray-600 mb-6">{{ quizTitle }}</p>
 
     <div class="bg-gray-100 rounded-xl p-6 mb-6">
-      <div class="text-5xl font-bold text-primary-600">
-        {{ score }} / {{ total }}
-      </div>
+      <div class="text-5xl font-bold text-primary-600">{{ score }} / {{ total }}</div>
       <div class="text-gray-500 mt-2">{{ percentage }}% de reussite</div>
     </div>
 
@@ -65,8 +63,6 @@ const emoji = computed(() => {
       ></div>
     </div>
 
-    <button @click="emit('back')" class="btn btn-primary w-full">
-      Retour au tableau de bord
-    </button>
+    <button @click="emit('back')" class="btn btn-primary w-full">Retour au tableau de bord</button>
   </div>
 </template>

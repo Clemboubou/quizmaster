@@ -47,30 +47,22 @@ function goToDashboard() {
       <!-- Loading -->
       <div v-if="loading" class="card text-center">
         <div class="text-5xl mb-4">&#x23F3;</div>
-        <h1 class="text-xl font-bold text-gray-900 mb-2">
-          Verification du paiement...
-        </h1>
-        <p class="text-gray-600">
-          Veuillez patienter quelques instants
-        </p>
+        <h1 class="text-xl font-bold text-gray-900 mb-2">Verification du paiement...</h1>
+        <p class="text-gray-600">Veuillez patienter quelques instants</p>
       </div>
 
       <!-- Success -->
       <div v-else-if="success" class="card text-center">
         <div class="text-6xl mb-4">&#x1F389;</div>
 
-        <h1 class="text-2xl font-bold text-gray-900 mb-2">
-          Paiement reussi !
-        </h1>
+        <h1 class="text-2xl font-bold text-gray-900 mb-2">Paiement reussi !</h1>
 
         <p class="text-gray-600 mb-6">
           Bienvenue dans la famille Premium ! Vous pouvez maintenant creer jusqu'a 20 quiz.
         </p>
 
         <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
-          <p class="text-green-700 font-medium">
-            Votre compte a ete mis a jour avec succes
-          </p>
+          <p class="text-green-700 font-medium">Votre compte a ete mis a jour avec succes</p>
         </div>
 
         <button @click="goToDashboard" class="btn btn-primary w-full py-3">
@@ -82,18 +74,14 @@ function goToDashboard() {
       <div v-else class="card text-center">
         <div class="text-6xl mb-4">&#x26A0;</div>
 
-        <h1 class="text-2xl font-bold text-gray-900 mb-2">
-          Erreur
-        </h1>
+        <h1 class="text-2xl font-bold text-gray-900 mb-2">Erreur</h1>
 
         <p class="text-red-600 mb-6">
           {{ error }}
         </p>
 
         <div class="space-y-3">
-          <router-link to="/payment" class="btn btn-primary w-full">
-            Reessayer
-          </router-link>
+          <router-link to="/payment" class="btn btn-primary w-full">Reessayer</router-link>
           <router-link to="/dashboard" class="btn btn-secondary w-full">
             Retour au tableau de bord
           </router-link>

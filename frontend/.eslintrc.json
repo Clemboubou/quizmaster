@@ -5,18 +5,12 @@
     "node": true,
     "vitest-globals/env": true
   },
-  "extends": [
-    "eslint:recommended",
-    "plugin:vue/vue3-recommended"
-  ],
+  "extends": ["eslint:recommended", "plugin:vue/vue3-recommended"],
   "parserOptions": {
     "ecmaVersion": "latest",
     "sourceType": "module"
   },
-  "plugins": [
-    "vue",
-    "vitest-globals"
-  ],
+  "plugins": ["vue", "vitest-globals"],
   "rules": {
     "indent": ["error", 2],
     "linebreak-style": ["error", "unix"],
@@ -30,22 +24,24 @@
     "eol-last": ["error", "always"],
     "vue/multi-word-component-names": "off",
     "vue/html-indent": ["error", 2],
-    "vue/max-attributes-per-line": ["error", {
-      "singleline": 3,
-      "multiline": 1
-    }],
-    "vue/singleline-html-element-content-newline": "off",
-    "vue/html-self-closing": ["error", {
-      "html": {
-        "void": "always",
-        "normal": "never",
-        "component": "always"
+    "vue/max-attributes-per-line": [
+      "error",
+      {
+        "singleline": 3,
+        "multiline": 1
       }
-    }]
+    ],
+    "vue/singleline-html-element-content-newline": "off",
+    "vue/html-self-closing": [
+      "error",
+      {
+        "html": {
+          "void": "always",
+          "normal": "never",
+          "component": "always"
+        }
+      }
+    ]
   },
-  "ignorePatterns": [
-    "node_modules/",
-    "dist/",
-    "coverage/"
-  ]
+  "ignorePatterns": ["node_modules/", "dist/", "coverage/"]
 }

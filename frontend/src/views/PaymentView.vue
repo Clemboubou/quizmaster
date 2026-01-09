@@ -35,13 +35,9 @@ async function startCheckout() {
       <div class="card text-center">
         <div class="text-5xl mb-4">&#x2B50;</div>
 
-        <h1 class="text-2xl font-bold text-gray-900 mb-2">
-          Passer Premium
-        </h1>
+        <h1 class="text-2xl font-bold text-gray-900 mb-2">Passer Premium</h1>
 
-        <p class="text-gray-600 mb-6">
-          Debloquez toutes les fonctionnalites de QuizMaster
-        </p>
+        <p class="text-gray-600 mb-6">Debloquez toutes les fonctionnalites de QuizMaster</p>
 
         <!-- Current status -->
         <div class="bg-gray-100 rounded-lg p-4 mb-6">
@@ -53,9 +49,7 @@ async function startCheckout() {
 
         <!-- Already premium -->
         <div v-if="authStore.isPremium" class="text-center">
-          <p class="text-green-600 mb-4">
-            Vous etes deja membre Premium !
-          </p>
+          <p class="text-green-600 mb-4">Vous etes deja membre Premium !</p>
           <router-link to="/dashboard" class="btn btn-primary">
             Retour au tableau de bord
           </router-link>
@@ -64,9 +58,7 @@ async function startCheckout() {
         <!-- Upgrade offer -->
         <template v-else>
           <div class="border-2 border-primary-200 rounded-xl p-6 mb-6">
-            <h2 class="text-xl font-bold text-primary-600 mb-4">
-              Forfait Premium
-            </h2>
+            <h2 class="text-xl font-bold text-primary-600 mb-4">Forfait Premium</h2>
 
             <div class="text-4xl font-bold text-gray-900 mb-4">
               9.99 EUR
@@ -92,11 +84,7 @@ async function startCheckout() {
               </li>
             </ul>
 
-            <button
-              @click="startCheckout"
-              :disabled="loading"
-              class="btn btn-primary w-full py-3"
-            >
+            <button @click="startCheckout" :disabled="loading" class="btn btn-primary w-full py-3">
               {{ loading ? 'Redirection...' : 'Passer Premium' }}
             </button>
 

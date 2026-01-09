@@ -20,26 +20,31 @@ const options = ref(['', '', '', ''])
 const correctAnswerIndex = ref(-1)
 
 // Si modification, remplir les champs
-watch(() => props.question, (newQuestion) => {
-  if (newQuestion) {
-    type.value = newQuestion.type
-    questionText.value = newQuestion.question_text
-    const parsedOptions = typeof newQuestion.options === 'string'
-      ? JSON.parse(newQuestion.options)
-      : [...newQuestion.options]
-    options.value = parsedOptions
-    correctAnswerIndex.value = parsedOptions.indexOf(newQuestion.correct_answer)
-  } else {
-    // Reset form
-    type.value = 'qcm'
-    questionText.value = ''
-    options.value = ['', '', '', '']
-    correctAnswerIndex.value = -1
-  }
-}, { immediate: true })
+watch(
+  () => props.question,
+  newQuestion => {
+    if (newQuestion) {
+      type.value = newQuestion.type
+      questionText.value = newQuestion.question_text
+      const parsedOptions =
+        typeof newQuestion.options === 'string'
+          ? JSON.parse(newQuestion.options)
+          : [...newQuestion.options]
+      options.value = parsedOptions
+      correctAnswerIndex.value = parsedOptions.indexOf(newQuestion.correct_answer)
+    } else {
+      // Reset form
+      type.value = 'qcm'
+      questionText.value = ''
+      options.value = ['', '', '', '']
+      correctAnswerIndex.value = -1
+    }
+  },
+  { immediate: true }
+)
 
 // Ajuster les options selon le type
-watch(type, (newType) => {
+watch(type, newType => {
   if (newType === 'vf') {
     options.value = ['Vrai', 'Faux']
   } else if (options.value.length === 2) {
@@ -108,7 +113,8 @@ function handleSubmit() {
     <!-- Options -->
     <div class="mb-4">
       <label class="block text-sm font-medium text-gray-700 mb-1">
-        Options <span class="text-gray-400 font-normal">(cliquez pour selectionner la bonne reponse)</span>
+        Options
+        <span class="text-gray-400 font-normal">(cliquez pour selectionner la bonne reponse)</span>
       </label>
       <div class="space-y-2">
         <div
@@ -133,10 +139,9 @@ function handleSubmit() {
             @click.stop
           />
           <span v-else class="flex-1 px-4 py-3 font-medium">{{ option }}</span>
-          <span
-            v-if="correctAnswerIndex === index"
-            class="px-3 text-green-600 font-medium"
-          >Correcte</span>
+          <span v-if="correctAnswerIndex === index" class="px-3 text-green-600 font-medium">
+            Correcte
+          </span>
         </div>
       </div>
     </div>
@@ -146,9 +151,7 @@ function handleSubmit() {
       <button type="submit" :disabled="!isValid" class="btn btn-primary">
         {{ question ? 'Modifier' : 'Ajouter' }}
       </button>
-      <button type="button" @click="emit('cancel')" class="btn btn-secondary">
-        Annuler
-      </button>
+      <button type="button" @click="emit('cancel')" class="btn btn-secondary">Annuler</button>
     </div>
   </form>
 </template>
