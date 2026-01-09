@@ -1164,12 +1164,72 @@ npm test -- --coverage
 
 ## 10. Industrialisation (ESLint, Prettier, CI/CD)
 
-L'**industrialisation** d'un projet consiste a mettre en place des outils pour automatiser et standardiser le developpement. Cela permet de :
+### Pourquoi industrialiser un projet ?
 
-- Garantir une **qualite de code** constante
-- **Detecter les erreurs** avant la production
-- **Automatiser les tests** et le deploiement
-- Faciliter le **travail en equipe**
+L'**industrialisation** d'un projet consiste a mettre en place des outils pour automatiser et standardiser le developpement. Sans industrialisation, on rencontre ces problemes :
+
+| Probleme | Consequence |
+|----------|-------------|
+| Code mal formate | Difficile a lire, merge conflicts inutiles |
+| Pas de verification automatique | Bugs decouverts trop tard en production |
+| Styles de code differents | Code incoherent, difficile a maintenir |
+| Tests manuels | Oublis, regressions non detectees |
+| Pas de validation avant merge | Code casse pousse sur main |
+
+L'industrialisation resout ces problemes en automatisant :
+- **Formatage** : Prettier formate le code automatiquement
+- **Verification** : ESLint detecte les erreurs avant execution
+- **Tests** : Vitest execute les tests a chaque push
+- **Integration** : GitHub Actions valide tout avant merge
+
+### Ce que nous avons mis en place
+
+#### Fichiers crees
+
+| Fichier | Role | Pourquoi necessaire |
+|---------|------|---------------------|
+| `backend/.eslintrc.json` | Config ESLint backend | Detecter erreurs JS cote serveur |
+| `backend/.prettierrc` | Config Prettier backend | Formatage uniforme (indent 4) |
+| `backend/.prettierignore` | Fichiers a ignorer | Eviter de formater node_modules |
+| `frontend/.eslintrc.json` | Config ESLint frontend | Detecter erreurs JS + Vue |
+| `frontend/.prettierrc` | Config Prettier frontend | Formatage uniforme (indent 2) |
+| `frontend/.prettierignore` | Fichiers a ignorer | Eviter de formater dist/ |
+| `.editorconfig` | Config editeurs | Coherence VS Code, WebStorm, etc. |
+| `.github/workflows/ci.yml` | Pipeline CI/CD | Automatiser verification a chaque push |
+
+#### Dependances ajoutees
+
+**Backend** (`package.json`) :
+```json
+"devDependencies": {
+  "eslint": "^8.56.0",
+  "eslint-plugin-vitest-globals": "^1.5.0",
+  "prettier": "^3.2.0"
+}
+```
+
+**Frontend** (`package.json`) :
+```json
+"devDependencies": {
+  "eslint": "^8.56.0",
+  "eslint-plugin-vue": "^9.20.0",
+  "eslint-plugin-vitest-globals": "^1.5.0",
+  "prettier": "^3.2.0"
+}
+```
+
+#### Scripts npm ajoutes
+
+Dans les deux `package.json`, j'ai ajoute ces scripts :
+
+```json
+"scripts": {
+  "lint": "eslint .",
+  "lint:fix": "eslint . --fix",
+  "format": "prettier --write .",
+  "format:check": "prettier --check ."
+}
+```
 
 ### ESLint - Linter JavaScript
 
@@ -1179,9 +1239,27 @@ L'**industrialisation** d'un projet consiste a mettre en place des outils pour a
 
 1. **Detecte les erreurs** avant l'execution (variables non definies, imports manquants)
 2. **Enforce un style** coherent dans toute l'equipe
-3. **Previent les bugs** courants (comparaisons faibles, variables non utilisees)
+3. **Previent les bugs** courants (comparaisons faibles `==` au lieu de `===`)
 
-#### Configuration Backend (`.eslintrc.json`)
+#### Probleme rencontre : Conflit ESLint / Prettier
+
+Lors de la mise en place, nous avons rencontre un **conflit entre ESLint et Prettier** :
+
+```
+# ESLint voulait des single quotes
+"quotes": ["error", "single"]
+
+# Mais Prettier reformatait parfois en double quotes
+# Resultat : boucle infinie de corrections
+```
+
+**Symptome** : Apres `npm run lint:fix`, Prettier rechangeait le formatage, puis ESLint se plaignait a nouveau.
+
+**Solution** : Laisser Prettier gerer TOUT le formatage et desactiver les regles de formatage dans ESLint. C'est la bonne pratique recommandee :
+
+> "Use Prettier for formatting, ESLint for code quality"
+
+#### Configuration Backend finale (`.eslintrc.json`)
 
 ```json
 {
@@ -1191,58 +1269,72 @@ L'**industrialisation** d'un projet consiste a mettre en place des outils pour a
     "vitest-globals/env": true
   },
   "extends": ["eslint:recommended"],
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+  },
+  "plugins": ["vitest-globals"],
   "rules": {
-    "indent": ["error", 4],
-    "quotes": ["error", "single"],
-    "semi": ["error", "never"],
     "no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
-    "eqeqeq": ["error", "always"],
-    "no-trailing-spaces": "error"
-  }
+    "no-console": "warn",
+    "eqeqeq": ["error", "always"]
+  },
+  "ignorePatterns": ["node_modules/", "coverage/"]
 }
 ```
 
-**Explication des regles :**
+**Explication des choix :**
 
-| Regle | Description |
-|-------|-------------|
-| `indent: 4` | Indentation de 4 espaces |
-| `quotes: single` | Utiliser les apostrophes `'` |
-| `semi: never` | Pas de point-virgule a la fin |
-| `eqeqeq: always` | Toujours utiliser `===` au lieu de `==` |
-| `no-unused-vars` | Avertit si une variable n'est pas utilisee |
+| Regle | Valeur | Pourquoi |
+|-------|--------|----------|
+| `no-unused-vars` | warn | Avertit sans bloquer (utile en dev) |
+| `argsIgnorePattern: ^_` | - | Ignore les params prefixes par `_` (convention) |
+| `no-console` | warn | Rappelle de supprimer les console.log |
+| `eqeqeq` | error | Force `===` pour eviter les bugs de coercition |
 
-#### Configuration Frontend (`.eslintrc.json`)
+**Regles volontairement absentes** (gerees par Prettier) :
+- `indent` - Prettier gere l'indentation
+- `quotes` - Prettier gere les guillemets
+- `semi` - Prettier gere les points-virgules
+- `comma-dangle` - Prettier gere les virgules
 
-Le frontend utilise le plugin **eslint-plugin-vue** pour analyser les fichiers `.vue` :
+#### Configuration Frontend finale (`.eslintrc.json`)
 
 ```json
 {
-  "extends": [
-    "eslint:recommended",
-    "plugin:vue/vue3-recommended"
-  ],
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "node": true,
+    "vitest-globals/env": true
+  },
+  "extends": ["eslint:recommended", "plugin:vue/vue3-recommended"],
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+  },
+  "plugins": ["vue", "vitest-globals"],
   "rules": {
-    "indent": ["error", 2],
+    "no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
+    "no-console": "warn",
+    "eqeqeq": ["error", "always"],
     "vue/multi-word-component-names": "off",
-    "vue/html-indent": ["error", 2],
-    "vue/max-attributes-per-line": ["error", {
-      "singleline": 3,
-      "multiline": 1
-    }]
-  }
+    "vue/singleline-html-element-content-newline": "off",
+    "vue/max-attributes-per-line": "off",
+    "vue/html-self-closing": "off"
+  },
+  "ignorePatterns": ["node_modules/", "dist/", "coverage/"]
 }
 ```
 
-#### Commandes ESLint
+**Regles Vue desactivees et pourquoi :**
 
-```bash
-# Verifier le code (backend ou frontend)
-npm run lint
-
-# Corriger automatiquement les erreurs
-npm run lint:fix
-```
+| Regle | Pourquoi desactivee |
+|-------|---------------------|
+| `vue/multi-word-component-names` | Nos composants comme `Navbar` sont valides |
+| `vue/max-attributes-per-line` | Conflit avec Prettier qui gere ca |
+| `vue/html-self-closing` | Conflit avec Prettier |
+| `vue/singleline-html-element-content-newline` | Conflit avec Prettier |
 
 ### Prettier - Formateur de code
 
@@ -1456,6 +1548,139 @@ Si une etape echoue (ex: test qui ne passe pas), le workflow s'arrete et affiche
 | **Automatisation** | Plus besoin de lancer les tests manuellement |
 | **Historique** | Chaque execution est tracee et consultable |
 | **Collaboration** | Tout le monde suit les memes standards |
+
+### Problemes rencontres et solutions
+
+Lors de la mise en place du CI/CD, nous avons rencontre plusieurs problemes qu'il a fallu resoudre.
+
+#### Probleme 1 : package-lock.json desynchronise
+
+**Erreur GitHub Actions :**
+```
+npm error `npm ci` can only install packages when your package.json
+and package-lock.json are in sync.
+npm error Missing: eslint@8.57.1 from lock file
+npm error Missing: prettier@3.7.4 from lock file
+```
+
+**Explication** : La commande `npm ci` (utilisee en CI) exige que le `package-lock.json` soit parfaitement synchronise avec `package.json`. Comme nous avions ajoute ESLint et Prettier dans `package.json` mais pas reinstalle les dependances, le lock file etait obsolete.
+
+**Solution** :
+```bash
+cd backend && npm install
+cd ../frontend && npm install
+git add package-lock.json
+git commit -m "fix: update package-lock.json"
+git push
+```
+
+**Lecon apprise** : Toujours faire `npm install` apres avoir modifie `package.json`, puis committer le `package-lock.json`.
+
+#### Probleme 2 : Fichiers non formates
+
+**Erreur GitHub Actions :**
+```
+[warn] src/components/Navbar.vue
+[warn] src/stores/quiz.js
+[warn] Code style issues found in 25 files.
+Error: Process completed with exit code 1.
+```
+
+**Explication** : Les fichiers existants n'avaient jamais ete formates avec Prettier. Le CI verifiait le formatage avec `npm run format:check` qui echoue si des fichiers ne sont pas conformes.
+
+**Solution** :
+```bash
+cd frontend && npm run format
+cd ../backend && npm run format
+git add .
+git commit -m "style: format all files with Prettier"
+git push
+```
+
+**Lecon apprise** : Apres avoir configure Prettier, toujours formater tous les fichiers existants avant de push.
+
+#### Probleme 3 : Conflit ESLint / Prettier sur les quotes
+
+**Erreur** :
+```
+src/stores/quiz.js
+  189:59  error  Strings must use singlequote  quotes
+
+# Apres npm run lint:fix, Prettier remet des double quotes
+# Boucle infinie !
+```
+
+**Explication** : ESLint avait la regle `"quotes": ["error", "single"]` et Prettier avait `"singleQuote": true`. Mais dans certains cas (template literals, JSON), Prettier utilisait quand meme des double quotes, ce qui faisait echouer ESLint.
+
+**Solution** : Supprimer les regles de formatage d'ESLint et laisser Prettier tout gerer :
+
+```json
+// AVANT (conflits)
+"rules": {
+  "quotes": ["error", "single"],
+  "semi": ["error", "never"],
+  "indent": ["error", 2]
+}
+
+// APRES (pas de conflits)
+"rules": {
+  "eqeqeq": ["error", "always"],
+  "no-unused-vars": ["warn"]
+}
+```
+
+**Lecon apprise** : ESLint = qualite du code, Prettier = formatage. Ne jamais melanger.
+
+#### Probleme 4 : Regles Vue trop strictes
+
+**Erreur** :
+```
+vue/max-attributes-per-line - 'placeholder' should be on a new line
+vue/html-self-closing - Require self-closing on HTML elements
+```
+
+**Explication** : Le plugin `eslint-plugin-vue` avec `vue3-recommended` active des regles tres strictes sur le formatage HTML. Ces regles entraient en conflit avec Prettier.
+
+**Solution** : Desactiver les regles Vue qui concernent le formatage :
+
+```json
+"rules": {
+  "vue/max-attributes-per-line": "off",
+  "vue/html-self-closing": "off",
+  "vue/singleline-html-element-content-newline": "off"
+}
+```
+
+### Resultat final
+
+Apres resolution de tous les problemes, le pipeline CI/CD passe avec succes :
+
+```
+✅ CI/CD Pipeline - Success (37s)
+   ├── ✅ Backend CI (15s)
+   │   ├── ✅ Install dependencies
+   │   ├── ✅ Check formatting (Prettier)
+   │   ├── ✅ Lint code (ESLint) - 4 warnings
+   │   └── ✅ Run tests - 50 passed
+   │
+   └── ✅ Frontend CI (22s)
+       ├── ✅ Install dependencies
+       ├── ✅ Check formatting (Prettier)
+       ├── ✅ Lint code (ESLint) - 5 warnings
+       ├── ✅ Run tests - 149 passed
+       └── ✅ Build application
+```
+
+**Warnings restants (acceptables)** :
+
+| Warning | Fichier | Explication |
+|---------|---------|-------------|
+| `'_' is assigned but never used` | auth.test.js | Convention pour ignorer des valeurs |
+| `'router' is assigned but never used` | DashboardView.vue | Prepare pour usage futur |
+| `Unexpected console statement` | PlayQuizView.vue | console.log de debug |
+| `'vi' is defined but never used` | tests/*.js | Import pour usage potentiel |
+
+Ces warnings sont en `warn` (pas `error`) donc ils n'empechent pas le build. Ils servent de rappels pour le developpeur.
 
 ### Scripts npm disponibles
 
