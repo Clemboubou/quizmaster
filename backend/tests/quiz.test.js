@@ -25,10 +25,11 @@ function getEleveToken(userId = 2) {
 function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization']
     const token = authHeader && authHeader.split(' ')[1]
-    if (!token)
+    if (!token) {
         return res
             .status(401)
             .json({ success: false, error: { code: 'AUTH_ERROR', message: 'Token manquant' } })
+    }
     try {
         req.user = jwt.verify(token, process.env.JWT_SECRET)
         next()
@@ -41,24 +42,22 @@ function authenticateToken(req, res, next) {
 
 // Middleware de role
 function requireProf(req, res, next) {
-    if (req.user.role !== 'prof')
-        return res
-            .status(403)
-            .json({
-                success: false,
-                error: { code: 'FORBIDDEN', message: 'Acces reserve aux professeurs' }
-            })
+    if (req.user.role !== 'prof') {
+        return res.status(403).json({
+            success: false,
+            error: { code: 'FORBIDDEN', message: 'Acces reserve aux professeurs' }
+        })
+    }
     next()
 }
 
 function requireEleve(req, res, next) {
-    if (req.user.role !== 'eleve')
-        return res
-            .status(403)
-            .json({
-                success: false,
-                error: { code: 'FORBIDDEN', message: 'Acces reserve aux eleves' }
-            })
+    if (req.user.role !== 'eleve') {
+        return res.status(403).json({
+            success: false,
+            error: { code: 'FORBIDDEN', message: 'Acces reserve aux eleves' }
+        })
+    }
     next()
 }
 
@@ -72,39 +71,36 @@ function createTestApp() {
     // Validation quiz
     function validateQuiz(req, res, next) {
         const { title } = req.body
-        if (!title)
-            return res
-                .status(400)
-                .json({
-                    success: false,
-                    error: {
-                        code: 'VALIDATION_ERROR',
-                        message: 'Le titre est requis',
-                        field: 'title'
-                    }
-                })
-        if (title.length < 3)
-            return res
-                .status(400)
-                .json({
-                    success: false,
-                    error: {
-                        code: 'VALIDATION_ERROR',
-                        message: 'Le titre doit contenir au moins 3 caracteres',
-                        field: 'title'
-                    }
-                })
-        if (title.length > 100)
-            return res
-                .status(400)
-                .json({
-                    success: false,
-                    error: {
-                        code: 'VALIDATION_ERROR',
-                        message: 'Le titre ne doit pas depasser 100 caracteres',
-                        field: 'title'
-                    }
-                })
+        if (!title) {
+            return res.status(400).json({
+                success: false,
+                error: {
+                    code: 'VALIDATION_ERROR',
+                    message: 'Le titre est requis',
+                    field: 'title'
+                }
+            })
+        }
+        if (title.length < 3) {
+            return res.status(400).json({
+                success: false,
+                error: {
+                    code: 'VALIDATION_ERROR',
+                    message: 'Le titre doit contenir au moins 3 caracteres',
+                    field: 'title'
+                }
+            })
+        }
+        if (title.length > 100) {
+            return res.status(400).json({
+                success: false,
+                error: {
+                    code: 'VALIDATION_ERROR',
+                    message: 'Le titre ne doit pas depasser 100 caracteres',
+                    field: 'title'
+                }
+            })
+        }
         next()
     }
 
@@ -117,12 +113,10 @@ function createTestApp() {
             )
             return res.status(200).json({ success: true, data: quizzes })
         } catch (error) {
-            return res
-                .status(500)
-                .json({
-                    success: false,
-                    error: { code: 'INTERNAL_ERROR', message: 'Erreur interne' }
-                })
+            return res.status(500).json({
+                success: false,
+                error: { code: 'INTERNAL_ERROR', message: 'Erreur interne' }
+            })
         }
     })
 
@@ -133,13 +127,12 @@ function createTestApp() {
                 'SELECT id, title, access_code, created_at FROM quizzes WHERE access_code = ?',
                 [req.params.code.toUpperCase()]
             )
-            if (quizzes.length === 0)
-                return res
-                    .status(404)
-                    .json({
-                        success: false,
-                        error: { code: 'NOT_FOUND', message: 'Quiz non trouve' }
-                    })
+            if (quizzes.length === 0) {
+                return res.status(404).json({
+                    success: false,
+                    error: { code: 'NOT_FOUND', message: 'Quiz non trouve' }
+                })
+            }
             const quiz = quizzes[0]
             const [questions] = await mockPool.query(
                 'SELECT id, type, question_text, options FROM questions WHERE quiz_id = ?',
@@ -147,12 +140,10 @@ function createTestApp() {
             )
             return res.status(200).json({ success: true, data: { ...quiz, questions } })
         } catch (error) {
-            return res
-                .status(500)
-                .json({
-                    success: false,
-                    error: { code: 'INTERNAL_ERROR', message: 'Erreur interne' }
-                })
+            return res.status(500).json({
+                success: false,
+                error: { code: 'INTERNAL_ERROR', message: 'Erreur interne' }
+            })
         }
     })
 
@@ -163,21 +154,18 @@ function createTestApp() {
                 'SELECT * FROM quizzes WHERE id = ? AND user_id = ?',
                 [req.params.id, req.user.userId]
             )
-            if (quizzes.length === 0)
-                return res
-                    .status(404)
-                    .json({
-                        success: false,
-                        error: { code: 'NOT_FOUND', message: 'Quiz non trouve' }
-                    })
+            if (quizzes.length === 0) {
+                return res.status(404).json({
+                    success: false,
+                    error: { code: 'NOT_FOUND', message: 'Quiz non trouve' }
+                })
+            }
             return res.status(200).json({ success: true, data: quizzes[0] })
         } catch (error) {
-            return res
-                .status(500)
-                .json({
-                    success: false,
-                    error: { code: 'INTERNAL_ERROR', message: 'Erreur interne' }
-                })
+            return res.status(500).json({
+                success: false,
+                error: { code: 'INTERNAL_ERROR', message: 'Erreur interne' }
+            })
         }
     })
 
@@ -198,15 +186,13 @@ function createTestApp() {
                 [userId]
             )
             if (countResult[0].count >= maxQuizzes) {
-                return res
-                    .status(403)
-                    .json({
-                        success: false,
-                        error: {
-                            code: 'FORBIDDEN',
-                            message: `Limite de quiz atteinte (${maxQuizzes} quiz maximum)`
-                        }
-                    })
+                return res.status(403).json({
+                    success: false,
+                    error: {
+                        code: 'FORBIDDEN',
+                        message: `Limite de quiz atteinte (${maxQuizzes} quiz maximum)`
+                    }
+                })
             }
 
             // Generer code unique
@@ -215,8 +201,9 @@ function createTestApp() {
             let codeExists = true
             while (codeExists) {
                 accessCode = ''
-                for (let i = 0; i < 5; i++)
+                for (let i = 0; i < 5; i++) {
                     accessCode += chars.charAt(Math.floor(Math.random() * chars.length))
+                }
                 const [existing] = await mockPool.query(
                     'SELECT id FROM quizzes WHERE access_code = ?',
                     [accessCode]
@@ -234,12 +221,10 @@ function createTestApp() {
 
             return res.status(201).json({ success: true, data: quizzes[0] })
         } catch (error) {
-            return res
-                .status(500)
-                .json({
-                    success: false,
-                    error: { code: 'INTERNAL_ERROR', message: 'Erreur interne' }
-                })
+            return res.status(500).json({
+                success: false,
+                error: { code: 'INTERNAL_ERROR', message: 'Erreur interne' }
+            })
         }
     })
 
@@ -250,13 +235,12 @@ function createTestApp() {
                 'SELECT * FROM quizzes WHERE id = ? AND user_id = ?',
                 [req.params.id, req.user.userId]
             )
-            if (quizzes.length === 0)
-                return res
-                    .status(404)
-                    .json({
-                        success: false,
-                        error: { code: 'NOT_FOUND', message: 'Quiz non trouve' }
-                    })
+            if (quizzes.length === 0) {
+                return res.status(404).json({
+                    success: false,
+                    error: { code: 'NOT_FOUND', message: 'Quiz non trouve' }
+                })
+            }
 
             await mockPool.query('UPDATE quizzes SET title = ? WHERE id = ?', [
                 req.body.title,
@@ -268,12 +252,10 @@ function createTestApp() {
 
             return res.status(200).json({ success: true, data: updatedQuizzes[0] })
         } catch (error) {
-            return res
-                .status(500)
-                .json({
-                    success: false,
-                    error: { code: 'INTERNAL_ERROR', message: 'Erreur interne' }
-                })
+            return res.status(500).json({
+                success: false,
+                error: { code: 'INTERNAL_ERROR', message: 'Erreur interne' }
+            })
         }
     })
 
@@ -284,23 +266,20 @@ function createTestApp() {
                 'SELECT * FROM quizzes WHERE id = ? AND user_id = ?',
                 [req.params.id, req.user.userId]
             )
-            if (quizzes.length === 0)
-                return res
-                    .status(404)
-                    .json({
-                        success: false,
-                        error: { code: 'NOT_FOUND', message: 'Quiz non trouve' }
-                    })
+            if (quizzes.length === 0) {
+                return res.status(404).json({
+                    success: false,
+                    error: { code: 'NOT_FOUND', message: 'Quiz non trouve' }
+                })
+            }
 
             await mockPool.query('DELETE FROM quizzes WHERE id = ?', [req.params.id])
             return res.status(204).send()
         } catch (error) {
-            return res
-                .status(500)
-                .json({
-                    success: false,
-                    error: { code: 'INTERNAL_ERROR', message: 'Erreur interne' }
-                })
+            return res.status(500).json({
+                success: false,
+                error: { code: 'INTERNAL_ERROR', message: 'Erreur interne' }
+            })
         }
     })
 

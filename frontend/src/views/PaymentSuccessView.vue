@@ -65,7 +65,7 @@ function goToDashboard() {
           <p class="text-green-700 font-medium">Votre compte a ete mis a jour avec succes</p>
         </div>
 
-        <button @click="goToDashboard" class="btn btn-primary w-full py-3">
+        <button class="btn btn-primary w-full py-3" @click="goToDashboard">
           Aller au tableau de bord
         </button>
       </div>

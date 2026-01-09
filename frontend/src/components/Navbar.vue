@@ -39,7 +39,7 @@ function handleLogout() {
               {{ authStore.isPremium ? 'Premium' : 'Gratuit' }}
             </span>
 
-            <button @click="handleLogout" class="btn btn-secondary text-sm">Deconnexion</button>
+            <button class="btn btn-secondary text-sm" @click="handleLogout">Deconnexion</button>
           </template>
 
           <template v-else>

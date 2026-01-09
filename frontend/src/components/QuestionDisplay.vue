@@ -60,13 +60,13 @@ function submitAnswer() {
       <button
         v-for="(option, index) in options"
         :key="index"
-        @click="selectedAnswer = option"
         :class="[
           'w-full p-4 text-left rounded-lg border-2 transition-all',
           selectedAnswer === option
             ? 'border-primary-600 bg-primary-50'
             : 'border-gray-200 hover:border-gray-300'
         ]"
+        @click="selectedAnswer = option"
       >
         <span class="font-medium">{{ String.fromCharCode(65 + index) }}.</span>
         {{ option }}
@@ -75,10 +75,10 @@ function submitAnswer() {
 
     <!-- Submit -->
     <button
-      @click="submitAnswer"
       :disabled="!selectedAnswer"
       class="btn btn-primary w-full py-3"
       :class="{ 'opacity-50 cursor-not-allowed': !selectedAnswer }"
+      @click="submitAnswer"
     >
       {{ questionNumber === totalQuestions ? 'Terminer' : 'Question suivante' }}
     </button>

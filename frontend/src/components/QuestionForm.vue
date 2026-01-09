@@ -82,7 +82,7 @@ function handleSubmit() {
 </script>
 
 <template>
-  <form @submit.prevent="handleSubmit" class="card">
+  <form class="card" @submit.prevent="handleSubmit">
     <h3 class="text-lg font-semibold mb-4">
       {{ question ? 'Modifier la question' : 'Nouvelle question' }}
     </h3>
@@ -120,7 +120,6 @@ function handleSubmit() {
         <div
           v-for="(option, index) in options"
           :key="index"
-          @click="(type === 'vf' || options[index]) && (correctAnswerIndex = index)"
           :class="[
             'flex items-center rounded-lg border-2 transition-all cursor-pointer',
             correctAnswerIndex === index
@@ -129,6 +128,7 @@ function handleSubmit() {
                 ? 'border-red-300 bg-red-50'
                 : 'border-gray-200 hover:border-gray-300'
           ]"
+          @click="(type === 'vf' || options[index]) && (correctAnswerIndex = index)"
         >
           <input
             v-if="type === 'qcm'"
@@ -151,7 +151,7 @@ function handleSubmit() {
       <button type="submit" :disabled="!isValid" class="btn btn-primary">
         {{ question ? 'Modifier' : 'Ajouter' }}
       </button>
-      <button type="button" @click="emit('cancel')" class="btn btn-secondary">Annuler</button>
+      <button type="button" class="btn btn-secondary" @click="emit('cancel')">Annuler</button>
     </div>
   </form>
 </template>

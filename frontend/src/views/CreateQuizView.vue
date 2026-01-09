@@ -137,10 +137,10 @@ function cancelQuestionForm() {
             <p v-if="titleError" class="error-text">{{ titleError }}</p>
           </div>
           <button
-            @click="saveQuiz"
             :disabled="!canSave || saving"
             class="btn btn-primary"
             :class="{ 'opacity-50 cursor-not-allowed': !canSave || saving }"
+            @click="saveQuiz"
           >
             {{ saving ? 'Sauvegarde...' : isEditing ? 'Mettre a jour' : 'Creer' }}
           </button>
@@ -155,8 +155,8 @@ function cancelQuestionForm() {
           <h2 class="text-lg font-semibold">Questions ({{ questions.length }})</h2>
           <button
             v-if="!showQuestionForm && questions.length > 0"
-            @click="showQuestionForm = true"
             class="btn btn-primary"
+            @click="showQuestionForm = true"
           >
             Ajouter une question
           </button>
@@ -167,15 +167,15 @@ function cancelQuestionForm() {
           v-if="showQuestionForm"
           :quiz-id="quizId"
           :question="editingQuestion"
+          class="mb-6"
           @submit="handleQuestionSubmit"
           @cancel="cancelQuestionForm"
-          class="mb-6"
         />
 
         <!-- Questions List -->
         <div v-if="questions.length === 0 && !showQuestionForm" class="card text-center py-8">
           <p class="text-gray-500 mb-4">Aucune question pour le moment</p>
-          <button @click="showQuestionForm = true" class="btn btn-primary">
+          <button class="btn btn-primary" @click="showQuestionForm = true">
             Ajouter la premiere question
           </button>
         </div>
@@ -214,14 +214,14 @@ function cancelQuestionForm() {
 
               <div class="flex space-x-2 ml-4">
                 <button
-                  @click="editQuestion(question)"
                   class="text-primary-600 hover:text-primary-800"
+                  @click="editQuestion(question)"
                 >
                   Modifier
                 </button>
                 <button
-                  @click="deleteQuestion(question.id)"
                   class="text-red-600 hover:text-red-800"
+                  @click="deleteQuestion(question.id)"
                 >
                   Supprimer
                 </button>

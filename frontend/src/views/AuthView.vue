@@ -66,7 +66,7 @@ function toggleMode() {
           {{ isLogin ? 'Connexion' : 'Inscription' }}
         </h2>
 
-        <form @submit.prevent="handleSubmit" class="space-y-6">
+        <form class="space-y-6" @submit.prevent="handleSubmit">
           <!-- Email -->
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
@@ -86,11 +86,11 @@ function toggleMode() {
             <label class="block text-sm font-medium text-gray-700 mb-1">Je suis</label>
             <div class="flex space-x-4">
               <label class="flex items-center">
-                <input type="radio" v-model="role" value="eleve" class="w-4 h-4 text-primary-600" />
+                <input v-model="role" type="radio" value="eleve" class="w-4 h-4 text-primary-600" />
                 <span class="ml-2">Eleve</span>
               </label>
               <label class="flex items-center">
-                <input type="radio" v-model="role" value="prof" class="w-4 h-4 text-primary-600" />
+                <input v-model="role" type="radio" value="prof" class="w-4 h-4 text-primary-600" />
                 <span class="ml-2">Professeur</span>
               </label>
             </div>
@@ -112,7 +112,7 @@ function toggleMode() {
 
         <!-- Toggle mode -->
         <div class="mt-6 text-center">
-          <button @click="toggleMode" class="text-primary-600 hover:text-primary-800 text-sm">
+          <button class="text-primary-600 hover:text-primary-800 text-sm" @click="toggleMode">
             {{ isLogin ? "Pas encore de compte ? S'inscrire" : 'Deja un compte ? Se connecter' }}
           </button>
         </div>

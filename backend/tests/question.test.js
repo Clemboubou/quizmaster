@@ -19,10 +19,11 @@ function getProfToken(userId = 1) {
 function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization']
     const token = authHeader && authHeader.split(' ')[1]
-    if (!token)
+    if (!token) {
         return res
             .status(401)
             .json({ success: false, error: { code: 'AUTH_ERROR', message: 'Token manquant' } })
+    }
     try {
         req.user = jwt.verify(token, process.env.JWT_SECRET)
         next()
@@ -34,105 +35,94 @@ function authenticateToken(req, res, next) {
 }
 
 function requireProf(req, res, next) {
-    if (req.user.role !== 'prof')
-        return res
-            .status(403)
-            .json({
-                success: false,
-                error: { code: 'FORBIDDEN', message: 'Acces reserve aux professeurs' }
-            })
+    if (req.user.role !== 'prof') {
+        return res.status(403).json({
+            success: false,
+            error: { code: 'FORBIDDEN', message: 'Acces reserve aux professeurs' }
+        })
+    }
     next()
 }
 
 // Validation question
 function validateQuestion(req, res, next) {
     const { quiz_id, type, question_text, options, correct_answer } = req.body
-    if (!quiz_id)
-        return res
-            .status(400)
-            .json({
-                success: false,
-                error: { code: 'VALIDATION_ERROR', message: 'quiz_id requis', field: 'quiz_id' }
-            })
-    if (!type)
-        return res
-            .status(400)
-            .json({
-                success: false,
-                error: { code: 'VALIDATION_ERROR', message: 'type requis', field: 'type' }
-            })
-    if (!['qcm', 'vf'].includes(type))
-        return res
-            .status(400)
-            .json({
-                success: false,
-                error: { code: 'VALIDATION_ERROR', message: 'type invalide', field: 'type' }
-            })
-    if (!question_text)
-        return res
-            .status(400)
-            .json({
-                success: false,
-                error: {
-                    code: 'VALIDATION_ERROR',
-                    message: 'question_text requis',
-                    field: 'question_text'
-                }
-            })
-    if (question_text.length < 10)
-        return res
-            .status(400)
-            .json({
-                success: false,
-                error: {
-                    code: 'VALIDATION_ERROR',
-                    message: 'question_text trop court',
-                    field: 'question_text'
-                }
-            })
-    if (!options || !Array.isArray(options))
-        return res
-            .status(400)
-            .json({
-                success: false,
-                error: { code: 'VALIDATION_ERROR', message: 'options requises', field: 'options' }
-            })
-    if (type === 'qcm' && options.length !== 4)
-        return res
-            .status(400)
-            .json({
-                success: false,
-                error: { code: 'VALIDATION_ERROR', message: 'QCM: 4 options', field: 'options' }
-            })
-    if (type === 'vf' && options.length !== 2)
-        return res
-            .status(400)
-            .json({
-                success: false,
-                error: { code: 'VALIDATION_ERROR', message: 'VF: 2 options', field: 'options' }
-            })
-    if (!correct_answer)
-        return res
-            .status(400)
-            .json({
-                success: false,
-                error: {
-                    code: 'VALIDATION_ERROR',
-                    message: 'correct_answer requis',
-                    field: 'correct_answer'
-                }
-            })
-    if (!options.includes(correct_answer))
-        return res
-            .status(400)
-            .json({
-                success: false,
-                error: {
-                    code: 'VALIDATION_ERROR',
-                    message: 'correct_answer doit etre dans options',
-                    field: 'correct_answer'
-                }
-            })
+    if (!quiz_id) {
+        return res.status(400).json({
+            success: false,
+            error: { code: 'VALIDATION_ERROR', message: 'quiz_id requis', field: 'quiz_id' }
+        })
+    }
+    if (!type) {
+        return res.status(400).json({
+            success: false,
+            error: { code: 'VALIDATION_ERROR', message: 'type requis', field: 'type' }
+        })
+    }
+    if (!['qcm', 'vf'].includes(type)) {
+        return res.status(400).json({
+            success: false,
+            error: { code: 'VALIDATION_ERROR', message: 'type invalide', field: 'type' }
+        })
+    }
+    if (!question_text) {
+        return res.status(400).json({
+            success: false,
+            error: {
+                code: 'VALIDATION_ERROR',
+                message: 'question_text requis',
+                field: 'question_text'
+            }
+        })
+    }
+    if (question_text.length < 10) {
+        return res.status(400).json({
+            success: false,
+            error: {
+                code: 'VALIDATION_ERROR',
+                message: 'question_text trop court',
+                field: 'question_text'
+            }
+        })
+    }
+    if (!options || !Array.isArray(options)) {
+        return res.status(400).json({
+            success: false,
+            error: { code: 'VALIDATION_ERROR', message: 'options requises', field: 'options' }
+        })
+    }
+    if (type === 'qcm' && options.length !== 4) {
+        return res.status(400).json({
+            success: false,
+            error: { code: 'VALIDATION_ERROR', message: 'QCM: 4 options', field: 'options' }
+        })
+    }
+    if (type === 'vf' && options.length !== 2) {
+        return res.status(400).json({
+            success: false,
+            error: { code: 'VALIDATION_ERROR', message: 'VF: 2 options', field: 'options' }
+        })
+    }
+    if (!correct_answer) {
+        return res.status(400).json({
+            success: false,
+            error: {
+                code: 'VALIDATION_ERROR',
+                message: 'correct_answer requis',
+                field: 'correct_answer'
+            }
+        })
+    }
+    if (!options.includes(correct_answer)) {
+        return res.status(400).json({
+            success: false,
+            error: {
+                code: 'VALIDATION_ERROR',
+                message: 'correct_answer doit etre dans options',
+                field: 'correct_answer'
+            }
+        })
+    }
     next()
 }
 
@@ -149,24 +139,21 @@ function createTestApp() {
                 'SELECT * FROM quizzes WHERE id = ? AND user_id = ?',
                 [req.params.quizId, req.user.userId]
             )
-            if (quizzes.length === 0)
-                return res
-                    .status(404)
-                    .json({
-                        success: false,
-                        error: { code: 'NOT_FOUND', message: 'Quiz non trouve' }
-                    })
+            if (quizzes.length === 0) {
+                return res.status(404).json({
+                    success: false,
+                    error: { code: 'NOT_FOUND', message: 'Quiz non trouve' }
+                })
+            }
             const [questions] = await mockPool.query('SELECT * FROM questions WHERE quiz_id = ?', [
                 req.params.quizId
             ])
             return res.status(200).json({ success: true, data: questions })
         } catch (error) {
-            return res
-                .status(500)
-                .json({
-                    success: false,
-                    error: { code: 'INTERNAL_ERROR', message: 'Erreur interne' }
-                })
+            return res.status(500).json({
+                success: false,
+                error: { code: 'INTERNAL_ERROR', message: 'Erreur interne' }
+            })
         }
     })
 
@@ -175,17 +162,17 @@ function createTestApp() {
         try {
             const { quiz_id, type, question_text, options, correct_answer } = req.body
             const [quizzes] = await mockPool.query('SELECT * FROM quizzes WHERE id = ?', [quiz_id])
-            if (quizzes.length === 0)
-                return res
-                    .status(404)
-                    .json({
-                        success: false,
-                        error: { code: 'NOT_FOUND', message: 'Quiz non trouve' }
-                    })
-            if (quizzes[0].user_id !== req.user.userId)
+            if (quizzes.length === 0) {
+                return res.status(404).json({
+                    success: false,
+                    error: { code: 'NOT_FOUND', message: 'Quiz non trouve' }
+                })
+            }
+            if (quizzes[0].user_id !== req.user.userId) {
                 return res
                     .status(403)
                     .json({ success: false, error: { code: 'FORBIDDEN', message: 'Non autorise' } })
+            }
 
             const [result] = await mockPool.query('INSERT INTO questions ...', [
                 quiz_id,
@@ -201,12 +188,10 @@ function createTestApp() {
             question.options = JSON.parse(question.options)
             return res.status(201).json({ success: true, data: question })
         } catch (error) {
-            return res
-                .status(500)
-                .json({
-                    success: false,
-                    error: { code: 'INTERNAL_ERROR', message: 'Erreur interne' }
-                })
+            return res.status(500).json({
+                success: false,
+                error: { code: 'INTERNAL_ERROR', message: 'Erreur interne' }
+            })
         }
     })
 
@@ -223,20 +208,18 @@ function createTestApp() {
                     'SELECT q.*, qz.user_id as quiz_owner_id FROM questions q JOIN quizzes qz ON q.quiz_id = qz.id WHERE q.id = ?',
                     [req.params.id]
                 )
-                if (questions.length === 0)
-                    return res
-                        .status(404)
-                        .json({
-                            success: false,
-                            error: { code: 'NOT_FOUND', message: 'Question non trouvee' }
-                        })
-                if (questions[0].quiz_owner_id !== req.user.userId)
-                    return res
-                        .status(403)
-                        .json({
-                            success: false,
-                            error: { code: 'FORBIDDEN', message: 'Non autorise' }
-                        })
+                if (questions.length === 0) {
+                    return res.status(404).json({
+                        success: false,
+                        error: { code: 'NOT_FOUND', message: 'Question non trouvee' }
+                    })
+                }
+                if (questions[0].quiz_owner_id !== req.user.userId) {
+                    return res.status(403).json({
+                        success: false,
+                        error: { code: 'FORBIDDEN', message: 'Non autorise' }
+                    })
+                }
 
                 await mockPool.query('UPDATE questions ...', [
                     type,
@@ -253,12 +236,10 @@ function createTestApp() {
                 question.options = JSON.parse(question.options)
                 return res.status(200).json({ success: true, data: question })
             } catch (error) {
-                return res
-                    .status(500)
-                    .json({
-                        success: false,
-                        error: { code: 'INTERNAL_ERROR', message: 'Erreur interne' }
-                    })
+                return res.status(500).json({
+                    success: false,
+                    error: { code: 'INTERNAL_ERROR', message: 'Erreur interne' }
+                })
             }
         }
     )
@@ -270,27 +251,25 @@ function createTestApp() {
                 'SELECT q.*, qz.user_id as quiz_owner_id FROM questions q JOIN quizzes qz ON q.quiz_id = qz.id WHERE q.id = ?',
                 [req.params.id]
             )
-            if (questions.length === 0)
-                return res
-                    .status(404)
-                    .json({
-                        success: false,
-                        error: { code: 'NOT_FOUND', message: 'Question non trouvee' }
-                    })
-            if (questions[0].quiz_owner_id !== req.user.userId)
+            if (questions.length === 0) {
+                return res.status(404).json({
+                    success: false,
+                    error: { code: 'NOT_FOUND', message: 'Question non trouvee' }
+                })
+            }
+            if (questions[0].quiz_owner_id !== req.user.userId) {
                 return res
                     .status(403)
                     .json({ success: false, error: { code: 'FORBIDDEN', message: 'Non autorise' } })
+            }
 
             await mockPool.query('DELETE FROM questions WHERE id = ?', [req.params.id])
             return res.status(204).send()
         } catch (error) {
-            return res
-                .status(500)
-                .json({
-                    success: false,
-                    error: { code: 'INTERNAL_ERROR', message: 'Erreur interne' }
-                })
+            return res.status(500).json({
+                success: false,
+                error: { code: 'INTERNAL_ERROR', message: 'Erreur interne' }
+            })
         }
     })
 

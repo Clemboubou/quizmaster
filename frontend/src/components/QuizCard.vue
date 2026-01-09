@@ -40,8 +40,8 @@ function copyCode() {
 
       <div class="flex items-center space-x-2">
         <button
-          @click="showCode = !showCode"
           class="text-sm text-primary-600 hover:text-primary-800"
+          @click="showCode = !showCode"
         >
           {{ showCode ? 'Masquer' : 'Voir le code' }}
         </button>
@@ -52,17 +52,17 @@ function copyCode() {
       <span class="font-mono text-2xl font-bold text-primary-600">
         {{ quiz.access_code }}
       </span>
-      <button @click="copyCode" class="text-sm text-gray-600 hover:text-gray-800">Copier</button>
+      <button class="text-sm text-gray-600 hover:text-gray-800" @click="copyCode">Copier</button>
     </div>
 
     <div v-if="showActions" class="mt-4 flex space-x-2">
       <router-link :to="`/create-quiz?edit=${quiz.id}`" class="btn btn-secondary text-sm">
         Modifier
       </router-link>
-      <button @click="emit('view-results', quiz.id)" class="btn btn-secondary text-sm">
+      <button class="btn btn-secondary text-sm" @click="emit('view-results', quiz.id)">
         Resultats
       </button>
-      <button @click="emit('delete', quiz.id)" class="btn btn-danger text-sm">Supprimer</button>
+      <button class="btn btn-danger text-sm" @click="emit('delete', quiz.id)">Supprimer</button>
     </div>
   </div>
 </template>

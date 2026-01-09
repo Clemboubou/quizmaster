@@ -31,117 +31,99 @@ function createTestApp() {
 
         // Email validation
         if (!email) {
-            return res
-                .status(400)
-                .json({
-                    success: false,
-                    error: {
-                        code: 'VALIDATION_ERROR',
-                        message: "L'email est requis",
-                        field: 'email'
-                    }
-                })
+            return res.status(400).json({
+                success: false,
+                error: {
+                    code: 'VALIDATION_ERROR',
+                    message: "L'email est requis",
+                    field: 'email'
+                }
+            })
         }
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
         if (!emailRegex.test(email)) {
-            return res
-                .status(400)
-                .json({
-                    success: false,
-                    error: {
-                        code: 'VALIDATION_ERROR',
-                        message: "Format d'email invalide",
-                        field: 'email'
-                    }
-                })
+            return res.status(400).json({
+                success: false,
+                error: {
+                    code: 'VALIDATION_ERROR',
+                    message: "Format d'email invalide",
+                    field: 'email'
+                }
+            })
         }
 
         // Password validation
         if (!password) {
-            return res
-                .status(400)
-                .json({
-                    success: false,
-                    error: {
-                        code: 'VALIDATION_ERROR',
-                        message: 'Le mot de passe est requis',
-                        field: 'password'
-                    }
-                })
+            return res.status(400).json({
+                success: false,
+                error: {
+                    code: 'VALIDATION_ERROR',
+                    message: 'Le mot de passe est requis',
+                    field: 'password'
+                }
+            })
         }
         if (password.length < 8) {
-            return res
-                .status(400)
-                .json({
-                    success: false,
-                    error: {
-                        code: 'VALIDATION_ERROR',
-                        message: 'Le mot de passe doit contenir au moins 8 caracteres',
-                        field: 'password'
-                    }
-                })
+            return res.status(400).json({
+                success: false,
+                error: {
+                    code: 'VALIDATION_ERROR',
+                    message: 'Le mot de passe doit contenir au moins 8 caracteres',
+                    field: 'password'
+                }
+            })
         }
         if (!/[A-Z]/.test(password)) {
-            return res
-                .status(400)
-                .json({
-                    success: false,
-                    error: {
-                        code: 'VALIDATION_ERROR',
-                        message: 'Le mot de passe doit contenir au moins une majuscule',
-                        field: 'password'
-                    }
-                })
+            return res.status(400).json({
+                success: false,
+                error: {
+                    code: 'VALIDATION_ERROR',
+                    message: 'Le mot de passe doit contenir au moins une majuscule',
+                    field: 'password'
+                }
+            })
         }
         if (!/[a-z]/.test(password)) {
-            return res
-                .status(400)
-                .json({
-                    success: false,
-                    error: {
-                        code: 'VALIDATION_ERROR',
-                        message: 'Le mot de passe doit contenir au moins une minuscule',
-                        field: 'password'
-                    }
-                })
+            return res.status(400).json({
+                success: false,
+                error: {
+                    code: 'VALIDATION_ERROR',
+                    message: 'Le mot de passe doit contenir au moins une minuscule',
+                    field: 'password'
+                }
+            })
         }
         if (!/[0-9]/.test(password)) {
-            return res
-                .status(400)
-                .json({
-                    success: false,
-                    error: {
-                        code: 'VALIDATION_ERROR',
-                        message: 'Le mot de passe doit contenir au moins un chiffre',
-                        field: 'password'
-                    }
-                })
+            return res.status(400).json({
+                success: false,
+                error: {
+                    code: 'VALIDATION_ERROR',
+                    message: 'Le mot de passe doit contenir au moins un chiffre',
+                    field: 'password'
+                }
+            })
         }
 
         // Role validation
         if (!role) {
-            return res
-                .status(400)
-                .json({
-                    success: false,
-                    error: {
-                        code: 'VALIDATION_ERROR',
-                        message: 'Le role est requis',
-                        field: 'role'
-                    }
-                })
+            return res.status(400).json({
+                success: false,
+                error: {
+                    code: 'VALIDATION_ERROR',
+                    message: 'Le role est requis',
+                    field: 'role'
+                }
+            })
         }
         if (!['prof', 'eleve'].includes(role)) {
-            return res
-                .status(400)
-                .json({
-                    success: false,
-                    error: {
-                        code: 'VALIDATION_ERROR',
-                        message: 'Le role doit etre "prof" ou "eleve"',
-                        field: 'role'
-                    }
-                })
+            return res.status(400).json({
+                success: false,
+                error: {
+                    code: 'VALIDATION_ERROR',
+                    message: 'Le role doit etre "prof" ou "eleve"',
+                    field: 'role'
+                }
+            })
         }
 
         try {
@@ -150,16 +132,14 @@ function createTestApp() {
                 email
             ])
             if (existingUsers.length > 0) {
-                return res
-                    .status(409)
-                    .json({
-                        success: false,
-                        error: {
-                            code: 'CONFLICT',
-                            message: 'Cet email est deja utilise',
-                            field: 'email'
-                        }
-                    })
+                return res.status(409).json({
+                    success: false,
+                    error: {
+                        code: 'CONFLICT',
+                        message: 'Cet email est deja utilise',
+                        field: 'email'
+                    }
+                })
             }
 
             // Hasher le mot de passe
@@ -184,12 +164,10 @@ function createTestApp() {
 
             return res.status(201).json({ success: true, data: { user: users[0], token } })
         } catch (error) {
-            return res
-                .status(500)
-                .json({
-                    success: false,
-                    error: { code: 'INTERNAL_ERROR', message: 'Erreur interne' }
-                })
+            return res.status(500).json({
+                success: false,
+                error: { code: 'INTERNAL_ERROR', message: 'Erreur interne' }
+            })
         }
     })
 
@@ -197,52 +175,44 @@ function createTestApp() {
         const { email, password } = req.body
 
         if (!email) {
-            return res
-                .status(400)
-                .json({
-                    success: false,
-                    error: {
-                        code: 'VALIDATION_ERROR',
-                        message: "L'email est requis",
-                        field: 'email'
-                    }
-                })
+            return res.status(400).json({
+                success: false,
+                error: {
+                    code: 'VALIDATION_ERROR',
+                    message: "L'email est requis",
+                    field: 'email'
+                }
+            })
         }
         if (!password) {
-            return res
-                .status(400)
-                .json({
-                    success: false,
-                    error: {
-                        code: 'VALIDATION_ERROR',
-                        message: 'Le mot de passe est requis',
-                        field: 'password'
-                    }
-                })
+            return res.status(400).json({
+                success: false,
+                error: {
+                    code: 'VALIDATION_ERROR',
+                    message: 'Le mot de passe est requis',
+                    field: 'password'
+                }
+            })
         }
 
         try {
             const [users] = await mockPool.query('SELECT * FROM users WHERE email = ?', [email])
 
             if (users.length === 0) {
-                return res
-                    .status(401)
-                    .json({
-                        success: false,
-                        error: { code: 'AUTH_ERROR', message: 'Email ou mot de passe incorrect' }
-                    })
+                return res.status(401).json({
+                    success: false,
+                    error: { code: 'AUTH_ERROR', message: 'Email ou mot de passe incorrect' }
+                })
             }
 
             const user = users[0]
             const isValidPassword = await bcrypt.compare(password, user.password)
 
             if (!isValidPassword) {
-                return res
-                    .status(401)
-                    .json({
-                        success: false,
-                        error: { code: 'AUTH_ERROR', message: 'Email ou mot de passe incorrect' }
-                    })
+                return res.status(401).json({
+                    success: false,
+                    error: { code: 'AUTH_ERROR', message: 'Email ou mot de passe incorrect' }
+                })
             }
 
             const token = jwt.sign({ userId: user.id, role: user.role }, process.env.JWT_SECRET, {
@@ -254,12 +224,10 @@ function createTestApp() {
                 .status(200)
                 .json({ success: true, data: { user: userWithoutPassword, token } })
         } catch (error) {
-            return res
-                .status(500)
-                .json({
-                    success: false,
-                    error: { code: 'INTERNAL_ERROR', message: 'Erreur interne' }
-                })
+            return res.status(500).json({
+                success: false,
+                error: { code: 'INTERNAL_ERROR', message: 'Erreur interne' }
+            })
         }
     })
 
@@ -282,30 +250,24 @@ function createTestApp() {
             )
 
             if (users.length === 0) {
-                return res
-                    .status(404)
-                    .json({
-                        success: false,
-                        error: { code: 'NOT_FOUND', message: 'Utilisateur non trouve' }
-                    })
+                return res.status(404).json({
+                    success: false,
+                    error: { code: 'NOT_FOUND', message: 'Utilisateur non trouve' }
+                })
             }
 
             return res.status(200).json({ success: true, data: users[0] })
         } catch (error) {
             if (error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError') {
-                return res
-                    .status(401)
-                    .json({
-                        success: false,
-                        error: { code: 'AUTH_ERROR', message: 'Token invalide' }
-                    })
-            }
-            return res
-                .status(500)
-                .json({
+                return res.status(401).json({
                     success: false,
-                    error: { code: 'INTERNAL_ERROR', message: 'Erreur interne' }
+                    error: { code: 'AUTH_ERROR', message: 'Token invalide' }
                 })
+            }
+            return res.status(500).json({
+                success: false,
+                error: { code: 'INTERNAL_ERROR', message: 'Erreur interne' }
+            })
         }
     })
 

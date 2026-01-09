@@ -63,6 +63,6 @@ const emoji = computed(() => {
       ></div>
     </div>
 
-    <button @click="emit('back')" class="btn btn-primary w-full">Retour au tableau de bord</button>
+    <button class="btn btn-primary w-full" @click="emit('back')">Retour au tableau de bord</button>
   </div>
 </template>

@@ -84,7 +84,7 @@ async function startCheckout() {
               </li>
             </ul>
 
-            <button @click="startCheckout" :disabled="loading" class="btn btn-primary w-full py-3">
+            <button :disabled="loading" class="btn btn-primary w-full py-3" @click="startCheckout">
               {{ loading ? 'Redirection...' : 'Passer Premium' }}
             </button>
 

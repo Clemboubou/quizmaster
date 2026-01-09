@@ -52,7 +52,7 @@ async function joinQuiz() {
           <div class="card">
             <h2 class="text-lg font-semibold text-gray-900 mb-4">Rejoindre un quiz</h2>
 
-            <form @submit.prevent="joinQuiz" class="space-y-4">
+            <form class="space-y-4" @submit.prevent="joinQuiz">
               <div>
                 <input
                   v-model="accessCode"
@@ -73,7 +73,7 @@ async function joinQuiz() {
         </div>
 
         <!-- CTA for professors -->
-        <div class="mt-12" v-if="!authStore.isAuthenticated">
+        <div v-if="!authStore.isAuthenticated" class="mt-12">
           <p class="text-gray-600 mb-4">Vous etes professeur ? Creez vos propres quiz !</p>
           <router-link to="/auth" class="btn btn-secondary">Se connecter / S'inscrire</router-link>
         </div>

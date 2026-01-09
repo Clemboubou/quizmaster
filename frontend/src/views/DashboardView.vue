@@ -117,7 +117,7 @@ const quizLimit = computed(() => (authStore.isPremium ? 20 : 1))
         <h1 class="text-2xl font-bold text-gray-900">
           {{ authStore.isProf ? 'Mes Quiz' : 'Mes Resultats' }}
         </h1>
-        <p class="text-gray-600 mt-1" v-if="authStore.isProf">
+        <p v-if="authStore.isProf" class="text-gray-600 mt-1">
           {{ quizStore.quizzes.length }} / {{ quizLimit }} quiz
           <span v-if="!authStore.isPremium" class="text-primary-600 ml-2">
             <router-link to="/payment">Passer Premium</router-link>
@@ -173,8 +173,8 @@ const quizLimit = computed(() => (authStore.isPremium ? 20 : 1))
         <div
           v-for="result in myResults"
           :key="result.id"
-          @click="viewMyAnswers(result)"
           class="card hover:bg-gray-50 cursor-pointer transition-colors"
+          @click="viewMyAnswers(result)"
         >
           <div class="flex justify-between items-center">
             <div>
@@ -211,8 +211,8 @@ const quizLimit = computed(() => (authStore.isPremium ? 20 : 1))
           <div class="flex items-center space-x-2">
             <button
               v-if="selectedResult"
-              @click="backToResults"
               class="text-gray-500 hover:text-gray-700"
+              @click="backToResults"
             >
               &larr;
             </button>
@@ -222,7 +222,7 @@ const quizLimit = computed(() => (authStore.isPremium ? 20 : 1))
               }}
             </h3>
           </div>
-          <button @click="closeResults" class="text-gray-500 hover:text-gray-700">X</button>
+          <button class="text-gray-500 hover:text-gray-700" @click="closeResults">X</button>
         </div>
 
         <!-- Loading answers -->
@@ -284,8 +284,8 @@ const quizLimit = computed(() => (authStore.isPremium ? 20 : 1))
             <div
               v-for="result in quizResults"
               :key="result.id"
-              @click="viewAnswers(result)"
               class="flex justify-between items-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors"
+              @click="viewAnswers(result)"
             >
               <span class="text-gray-700">{{ result.student_email }}</span>
               <div class="flex items-center space-x-3">
@@ -308,7 +308,7 @@ const quizLimit = computed(() => (authStore.isPremium ? 20 : 1))
         <!-- Header -->
         <div class="flex justify-between items-center mb-4">
           <h3 class="text-lg font-semibold">{{ selectedMyResult?.quiz_title }} - Mes reponses</h3>
-          <button @click="closeMyAnswers" class="text-gray-500 hover:text-gray-700">X</button>
+          <button class="text-gray-500 hover:text-gray-700" @click="closeMyAnswers">X</button>
         </div>
 
         <!-- Score summary -->

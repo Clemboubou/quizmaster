@@ -23,10 +23,11 @@ function getEleveToken(userId = 2) {
 function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization']
     const token = authHeader && authHeader.split(' ')[1]
-    if (!token)
+    if (!token) {
         return res
             .status(401)
             .json({ success: false, error: { code: 'AUTH_ERROR', message: 'Token manquant' } })
+    }
     try {
         req.user = jwt.verify(token, process.env.JWT_SECRET)
         next()
@@ -38,24 +39,22 @@ function authenticateToken(req, res, next) {
 }
 
 function requireProf(req, res, next) {
-    if (req.user.role !== 'prof')
-        return res
-            .status(403)
-            .json({
-                success: false,
-                error: { code: 'FORBIDDEN', message: 'Acces reserve aux professeurs' }
-            })
+    if (req.user.role !== 'prof') {
+        return res.status(403).json({
+            success: false,
+            error: { code: 'FORBIDDEN', message: 'Acces reserve aux professeurs' }
+        })
+    }
     next()
 }
 
 function requireEleve(req, res, next) {
-    if (req.user.role !== 'eleve')
-        return res
-            .status(403)
-            .json({
-                success: false,
-                error: { code: 'FORBIDDEN', message: 'Acces reserve aux eleves' }
-            })
+    if (req.user.role !== 'eleve') {
+        return res.status(403).json({
+            success: false,
+            error: { code: 'FORBIDDEN', message: 'Acces reserve aux eleves' }
+        })
+    }
     next()
 }
 
@@ -70,25 +69,22 @@ function createTestApp() {
         try {
             const { quiz_id, score } = req.body
             if (typeof score !== 'number' || score < 0) {
-                return res
-                    .status(400)
-                    .json({
-                        success: false,
-                        error: {
-                            code: 'VALIDATION_ERROR',
-                            message: 'Score invalide',
-                            field: 'score'
-                        }
-                    })
+                return res.status(400).json({
+                    success: false,
+                    error: {
+                        code: 'VALIDATION_ERROR',
+                        message: 'Score invalide',
+                        field: 'score'
+                    }
+                })
             }
             const [quizzes] = await mockPool.query('SELECT * FROM quizzes WHERE id = ?', [quiz_id])
-            if (quizzes.length === 0)
-                return res
-                    .status(404)
-                    .json({
-                        success: false,
-                        error: { code: 'NOT_FOUND', message: 'Quiz non trouve' }
-                    })
+            if (quizzes.length === 0) {
+                return res.status(404).json({
+                    success: false,
+                    error: { code: 'NOT_FOUND', message: 'Quiz non trouve' }
+                })
+            }
 
             const [result] = await mockPool.query('INSERT INTO results ...', [
                 req.user.userId,
@@ -100,12 +96,10 @@ function createTestApp() {
             ])
             return res.status(201).json({ success: true, data: results[0] })
         } catch (error) {
-            return res
-                .status(500)
-                .json({
-                    success: false,
-                    error: { code: 'INTERNAL_ERROR', message: 'Erreur interne' }
-                })
+            return res.status(500).json({
+                success: false,
+                error: { code: 'INTERNAL_ERROR', message: 'Erreur interne' }
+            })
         }
     })
 
@@ -118,12 +112,10 @@ function createTestApp() {
             )
             return res.status(200).json({ success: true, data: results })
         } catch (error) {
-            return res
-                .status(500)
-                .json({
-                    success: false,
-                    error: { code: 'INTERNAL_ERROR', message: 'Erreur interne' }
-                })
+            return res.status(500).json({
+                success: false,
+                error: { code: 'INTERNAL_ERROR', message: 'Erreur interne' }
+            })
         }
     })
 
@@ -134,13 +126,12 @@ function createTestApp() {
                 'SELECT * FROM quizzes WHERE id = ? AND user_id = ?',
                 [req.params.quizId, req.user.userId]
             )
-            if (quizzes.length === 0)
-                return res
-                    .status(404)
-                    .json({
-                        success: false,
-                        error: { code: 'NOT_FOUND', message: 'Quiz non trouve' }
-                    })
+            if (quizzes.length === 0) {
+                return res.status(404).json({
+                    success: false,
+                    error: { code: 'NOT_FOUND', message: 'Quiz non trouve' }
+                })
+            }
 
             const [results] = await mockPool.query(
                 'SELECT r.id, r.score, r.played_at, u.email as student_email FROM results r JOIN users u ON r.user_id = u.id WHERE r.quiz_id = ? ORDER BY r.played_at DESC',
@@ -148,12 +139,10 @@ function createTestApp() {
             )
             return res.status(200).json({ success: true, data: results })
         } catch (error) {
-            return res
-                .status(500)
-                .json({
-                    success: false,
-                    error: { code: 'INTERNAL_ERROR', message: 'Erreur interne' }
-                })
+            return res.status(500).json({
+                success: false,
+                error: { code: 'INTERNAL_ERROR', message: 'Erreur interne' }
+            })
         }
     })
 
