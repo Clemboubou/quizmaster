@@ -1,0 +1,28 @@
+# EditorConfig - Configuration unifiee pour tous les editeurs
+# https://editorconfig.org
+
+root = true
+
+# Configuration par defaut pour tous les fichiers
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+
+# Backend - Indentation 4 espaces
+[backend/**/*.js]
+indent_size = 4
+
+# Frontend - Indentation 2 espaces
+[frontend/**/*.{js,vue,css,html}]
+indent_size = 2
+
+# JSON et YAML
+[*.{json,yml,yaml}]
+indent_size = 2
+
+# Markdown - Garder les espaces en fin de ligne (syntaxe markdown)
+[*.md]
+trim_trailing_whitespace = false
