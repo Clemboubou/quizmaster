@@ -1,12 +1,12 @@
-import { defineConfig } from 'vitest/config';
+import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
     test: {
         globals: true,
         environment: 'node',
         coverage: {
-            reporter: ['text', 'html'],
+            reporter: ['text', 'html']
         },
-        testTimeout: 10000,
-    },
-});
+        testTimeout: 10000
+    }
+})

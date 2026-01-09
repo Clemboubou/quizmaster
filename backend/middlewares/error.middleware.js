@@ -2,7 +2,7 @@
  * Middleware de gestion globale des erreurs
  */
 function errorHandler(err, req, res, next) {
-    console.error('Erreur:', err);
+    console.error('Erreur:', err)
 
     // Erreur de parsing JSON
     if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
@@ -12,7 +12,7 @@ function errorHandler(err, req, res, next) {
                 code: 'INVALID_JSON',
                 message: 'Le format JSON est invalide'
             }
-        });
+        })
     }
 
     // Erreur par defaut
@@ -22,9 +22,9 @@ function errorHandler(err, req, res, next) {
             code: 'INTERNAL_ERROR',
             message: 'Une erreur interne est survenue'
         }
-    });
+    })
 }
 
 module.exports = {
     errorHandler
-};
+}

@@ -1,5 +1,5 @@
-const pool = require('../config/database');
-const { successResponse, errorResponse } = require('../utils/responses');
+const pool = require('../config/database')
+const { successResponse, errorResponse } = require('../utils/responses')
 
 /**
  * Enregistrer un score (pour les eleves)
@@ -7,31 +7,34 @@ const { successResponse, errorResponse } = require('../utils/responses');
  */
 async function createResult(req, res) {
     try {
-        const { quiz_id, score, answers } = req.body;
-        const userId = req.user.userId;
+        const { quiz_id, score, answers } = req.body
+        const userId = req.user.userId
 
         // Valider le score
         if (typeof score !== 'number' || score < 0) {
-            return errorResponse(res, 'VALIDATION_ERROR', 'Le score doit etre un entier positif ou nul', 400, 'score');
+            return errorResponse(
+                res,
+                'VALIDATION_ERROR',
+                'Le score doit etre un entier positif ou nul',
+                400,
+                'score'
+            )
         }
 
         // Verifier que le quiz existe
-        const [quizzes] = await pool.query(
-            'SELECT * FROM quizzes WHERE id = ?',
-            [quiz_id]
-        );
+        const [quizzes] = await pool.query('SELECT * FROM quizzes WHERE id = ?', [quiz_id])
 
         if (quizzes.length === 0) {
-            return errorResponse(res, 'NOT_FOUND', 'Quiz non trouve', 404);
+            return errorResponse(res, 'NOT_FOUND', 'Quiz non trouve', 404)
         }
 
         // Enregistrer le resultat
         const [result] = await pool.query(
             'INSERT INTO results (user_id, quiz_id, score) VALUES (?, ?, ?)',
             [userId, quiz_id, score]
-        );
+        )
 
-        const resultId = result.insertId;
+        const resultId = result.insertId
 
         // Enregistrer les reponses detaillees si fournies
         if (answers && Array.isArray(answers)) {
@@ -39,21 +42,17 @@ async function createResult(req, res) {
                 await pool.query(
                     'INSERT INTO answers (result_id, question_id, user_answer, is_correct) VALUES (?, ?, ?, ?)',
                     [resultId, answer.question_id, answer.user_answer, answer.is_correct]
-                );
+                )
             }
         }
 
         // Recuperer le resultat cree
-        const [results] = await pool.query(
-            'SELECT * FROM results WHERE id = ?',
-            [resultId]
-        );
+        const [results] = await pool.query('SELECT * FROM results WHERE id = ?', [resultId])
 
-        return successResponse(res, results[0], 201);
-
+        return successResponse(res, results[0], 201)
     } catch (error) {
-        console.error('Erreur createResult:', error);
-        return errorResponse(res, 'INTERNAL_ERROR', 'Erreur lors de l\'enregistrement du score', 500);
+        console.error('Erreur createResult:', error)
+        return errorResponse(res, 'INTERNAL_ERROR', "Erreur lors de l'enregistrement du score", 500)
     }
 }
 
@@ -63,16 +62,16 @@ async function createResult(req, res) {
  */
 async function getResultsByQuiz(req, res) {
     try {
-        const { quizId } = req.params;
+        const { quizId } = req.params
 
         // Verifier que le quiz appartient au professeur
-        const [quizzes] = await pool.query(
-            'SELECT * FROM quizzes WHERE id = ? AND user_id = ?',
-            [quizId, req.user.userId]
-        );
+        const [quizzes] = await pool.query('SELECT * FROM quizzes WHERE id = ? AND user_id = ?', [
+            quizId,
+            req.user.userId
+        ])
 
         if (quizzes.length === 0) {
-            return errorResponse(res, 'NOT_FOUND', 'Quiz non trouve', 404);
+            return errorResponse(res, 'NOT_FOUND', 'Quiz non trouve', 404)
         }
 
         // Recuperer les resultats avec les infos des eleves
@@ -83,13 +82,17 @@ async function getResultsByQuiz(req, res) {
              WHERE r.quiz_id = ?
              ORDER BY r.played_at DESC`,
             [quizId]
-        );
+        )
 
-        return successResponse(res, results);
-
+        return successResponse(res, results)
     } catch (error) {
-        console.error('Erreur getResultsByQuiz:', error);
-        return errorResponse(res, 'INTERNAL_ERROR', 'Erreur lors de la recuperation des resultats', 500);
+        console.error('Erreur getResultsByQuiz:', error)
+        return errorResponse(
+            res,
+            'INTERNAL_ERROR',
+            'Erreur lors de la recuperation des resultats',
+            500
+        )
     }
 }
 
@@ -107,13 +110,17 @@ async function getMyResults(req, res) {
              WHERE r.user_id = ?
              ORDER BY r.played_at DESC`,
             [req.user.userId]
-        );
+        )
 
-        return successResponse(res, results);
-
+        return successResponse(res, results)
     } catch (error) {
-        console.error('Erreur getMyResults:', error);
-        return errorResponse(res, 'INTERNAL_ERROR', 'Erreur lors de la recuperation des resultats', 500);
+        console.error('Erreur getMyResults:', error)
+        return errorResponse(
+            res,
+            'INTERNAL_ERROR',
+            'Erreur lors de la recuperation des resultats',
+            500
+        )
     }
 }
 
@@ -123,7 +130,7 @@ async function getMyResults(req, res) {
  */
 async function getResultAnswers(req, res) {
     try {
-        const { resultId } = req.params;
+        const { resultId } = req.params
 
         // Recuperer le resultat avec le quiz
         const [results] = await pool.query(
@@ -132,15 +139,15 @@ async function getResultAnswers(req, res) {
              JOIN quizzes q ON r.quiz_id = q.id
              WHERE r.id = ?`,
             [resultId]
-        );
+        )
 
         if (results.length === 0) {
-            return errorResponse(res, 'NOT_FOUND', 'Resultat non trouve', 404);
+            return errorResponse(res, 'NOT_FOUND', 'Resultat non trouve', 404)
         }
 
         // Verifier que le prof est le proprietaire du quiz
         if (results[0].quiz_owner_id !== req.user.userId) {
-            return errorResponse(res, 'FORBIDDEN', 'Acces non autorise', 403);
+            return errorResponse(res, 'FORBIDDEN', 'Acces non autorise', 403)
         }
 
         // Recuperer les reponses avec les questions
@@ -150,19 +157,23 @@ async function getResultAnswers(req, res) {
              JOIN questions q ON a.question_id = q.id
              WHERE a.result_id = ?`,
             [resultId]
-        );
+        )
 
         // Parser les options JSON
         const parsedAnswers = answers.map(a => ({
             ...a,
             options: typeof a.options === 'string' ? JSON.parse(a.options) : a.options
-        }));
+        }))
 
-        return successResponse(res, parsedAnswers);
-
+        return successResponse(res, parsedAnswers)
     } catch (error) {
-        console.error('Erreur getResultAnswers:', error);
-        return errorResponse(res, 'INTERNAL_ERROR', 'Erreur lors de la recuperation des reponses', 500);
+        console.error('Erreur getResultAnswers:', error)
+        return errorResponse(
+            res,
+            'INTERNAL_ERROR',
+            'Erreur lors de la recuperation des reponses',
+            500
+        )
     }
 }
 
@@ -172,16 +183,16 @@ async function getResultAnswers(req, res) {
  */
 async function getMyResultAnswers(req, res) {
     try {
-        const { resultId } = req.params;
+        const { resultId } = req.params
 
         // Recuperer le resultat
-        const [results] = await pool.query(
-            'SELECT * FROM results WHERE id = ? AND user_id = ?',
-            [resultId, req.user.userId]
-        );
+        const [results] = await pool.query('SELECT * FROM results WHERE id = ? AND user_id = ?', [
+            resultId,
+            req.user.userId
+        ])
 
         if (results.length === 0) {
-            return errorResponse(res, 'NOT_FOUND', 'Resultat non trouve', 404);
+            return errorResponse(res, 'NOT_FOUND', 'Resultat non trouve', 404)
         }
 
         // Recuperer les reponses avec les questions
@@ -191,19 +202,23 @@ async function getMyResultAnswers(req, res) {
              JOIN questions q ON a.question_id = q.id
              WHERE a.result_id = ?`,
             [resultId]
-        );
+        )
 
         // Parser les options JSON
         const parsedAnswers = answers.map(a => ({
             ...a,
             options: typeof a.options === 'string' ? JSON.parse(a.options) : a.options
-        }));
+        }))
 
-        return successResponse(res, parsedAnswers);
-
+        return successResponse(res, parsedAnswers)
     } catch (error) {
-        console.error('Erreur getMyResultAnswers:', error);
-        return errorResponse(res, 'INTERNAL_ERROR', 'Erreur lors de la recuperation des reponses', 500);
+        console.error('Erreur getMyResultAnswers:', error)
+        return errorResponse(
+            res,
+            'INTERNAL_ERROR',
+            'Erreur lors de la recuperation des reponses',
+            500
+        )
     }
 }
 
@@ -213,4 +228,4 @@ module.exports = {
     getMyResults,
     getResultAnswers,
     getMyResultAnswers
-};
+}
