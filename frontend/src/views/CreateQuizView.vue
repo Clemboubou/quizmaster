@@ -3,6 +3,10 @@ import { ref, onMounted, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useQuizStore } from '../stores/quiz'
 import QuestionForm from '../components/QuestionForm.vue'
+import { useSeo, seoPresets } from '../composables/useSeo'
+
+// SEO : Meta tags pour la creation de quiz
+useSeo(seoPresets.createQuiz)
 
 const router = useRouter()
 const route = useRoute()

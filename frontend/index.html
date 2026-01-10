@@ -1,13 +1,91 @@
 <!doctype html>
 <html lang="fr">
   <head>
+    <!-- Encodage et viewport (OBLIGATOIRE) -->
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>QuizMaster</title>
+
+    <!-- Titre de la page (CRITIQUE pour le SEO) -->
+    <title>QuizMaster - Creez et partagez des quiz interactifs</title>
+
+    <!-- Meta description (CRITIQUE pour le SEO) -->
+    <meta
+      name="description"
+      content="QuizMaster permet aux professeurs de creer des quiz interactifs (QCM, Vrai/Faux) et aux eleves de les passer en ligne. Gratuit et simple d'utilisation."
+    />
+
+    <!-- Meta keywords (moins important mais utile) -->
+    <meta
+      name="keywords"
+      content="quiz, qcm, education, professeur, eleve, test, examen, interactif, en ligne"
+    />
+
+    <!-- Auteur et copyright -->
+    <meta name="author" content="QuizMaster" />
+    <meta name="copyright" content="QuizMaster 2024" />
+
+    <!-- Robots (indexation par les moteurs de recherche) -->
+    <meta name="robots" content="index, follow" />
+
+    <!-- Canonical URL (evite le contenu duplique) -->
+    <link rel="canonical" href="https://quizmaster.app/" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+
+    <!-- Theme color (couleur de la barre d'adresse mobile) -->
+    <meta name="theme-color" content="#3B82F6" />
+
+    <!-- ============================================ -->
+    <!-- Open Graph (partage Facebook, LinkedIn, etc.) -->
+    <!-- ============================================ -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://quizmaster.app/" />
+    <meta property="og:title" content="QuizMaster - Creez et partagez des quiz interactifs" />
+    <meta
+      property="og:description"
+      content="Plateforme de creation de quiz pour professeurs et eleves. Creez des QCM et Vrai/Faux en quelques clics."
+    />
+    <meta property="og:image" content="https://quizmaster.app/og-image.png" />
+    <meta property="og:locale" content="fr_FR" />
+    <meta property="og:site_name" content="QuizMaster" />
+
+    <!-- ============================================ -->
+    <!-- Twitter Card (partage Twitter/X) -->
+    <!-- ============================================ -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://quizmaster.app/" />
+    <meta name="twitter:title" content="QuizMaster - Creez et partagez des quiz interactifs" />
+    <meta
+      name="twitter:description"
+      content="Plateforme de creation de quiz pour professeurs et eleves."
+    />
+    <meta name="twitter:image" content="https://quizmaster.app/og-image.png" />
+
+    <!-- ============================================ -->
+    <!-- Performance et securite -->
+    <!-- ============================================ -->
+    <!-- Preconnect aux domaines externes (accelere le chargement) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- DNS prefetch (resolution DNS anticipee) -->
+    <link rel="dns-prefetch" href="https://api.stripe.com" />
   </head>
   <body>
+    <!-- Noscript pour les utilisateurs sans JavaScript -->
+    <noscript>
+      <div style="padding: 20px; text-align: center; background: #fee2e2; color: #991b1b">
+        QuizMaster necessite JavaScript pour fonctionner. Veuillez activer JavaScript dans votre
+        navigateur.
+      </div>
+    </noscript>
+
+    <!-- Point de montage Vue.js -->
     <div id="app"></div>
+
+    <!-- Application Vue.js -->
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>

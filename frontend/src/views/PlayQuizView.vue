@@ -5,6 +5,10 @@ import { useQuizStore } from '../stores/quiz'
 import { useAuthStore } from '../stores/auth'
 import QuestionDisplay from '../components/QuestionDisplay.vue'
 import ScoreDisplay from '../components/ScoreDisplay.vue'
+import { useSeo, seoPresets } from '../composables/useSeo'
+
+// SEO : Meta tags pour jouer un quiz
+useSeo(seoPresets.play)
 
 const router = useRouter()
 const quizStore = useQuizStore()

@@ -3,6 +3,10 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { validateEmail, validatePassword } from '../utils/validators'
+import { useSeo, seoPresets } from '../composables/useSeo'
+
+// SEO : Meta tags pour la page d'authentification
+useSeo(seoPresets.auth)
 
 const router = useRouter()
 const authStore = useAuthStore()

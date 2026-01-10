@@ -12,7 +12,8 @@
 8. [Fonctionnalites implementees](#8-fonctionnalites-implementees)
 9. [Tests](#9-tests)
 10. [Industrialisation (ESLint, Prettier, CI/CD)](#10-industrialisation-eslint-prettier-cicd)
-11. [Installation et lancement](#11-installation-et-lancement)
+11. [SEO et Referencement](#11-seo-et-referencement)
+12. [Installation et lancement](#12-installation-et-lancement)
 
 ---
 
@@ -1870,7 +1871,459 @@ Prefixes courants :
 
 ---
 
-## 11. Installation et lancement
+## 11. SEO et Referencement
+
+### Qu'est-ce que le SEO ?
+
+Le **SEO** (Search Engine Optimization) ou **referencement naturel** est l'ensemble des techniques permettant d'ameliorer la visibilite d'un site web dans les resultats des moteurs de recherche (Google, Bing, etc.).
+
+**Pourquoi c'est important ?**
+
+| Sans SEO | Avec SEO |
+|----------|----------|
+| Site invisible sur Google | Site bien positionne |
+| Peu de trafic organique | Trafic gratuit et qualifie |
+| Dependance a la publicite | Visibilite durable |
+| Partage social basique | Apercu riche sur les reseaux |
+
+### Ce que nous avons implemente
+
+#### 1. Meta tags dans `index.html`
+
+Les **meta tags** sont des balises HTML invisibles qui donnent des informations aux moteurs de recherche.
+
+```html
+<!-- TITRE : Ce qui apparait dans l'onglet et les resultats Google -->
+<!-- CRITIQUE : 50-60 caracteres max, contient les mots-cles principaux -->
+<title>QuizMaster - Creez et partagez des quiz interactifs</title>
+
+<!-- DESCRIPTION : Texte sous le titre dans Google -->
+<!-- CRITIQUE : 150-160 caracteres, incite au clic -->
+<meta name="description" content="QuizMaster permet aux professeurs de
+creer des quiz interactifs (QCM, Vrai/Faux) et aux eleves de les passer
+en ligne. Gratuit et simple d'utilisation." />
+
+<!-- MOTS-CLES : Moins important aujourd'hui mais utile -->
+<meta name="keywords" content="quiz, qcm, education, professeur, eleve" />
+
+<!-- ROBOTS : Instructions pour l'indexation -->
+<!-- index = indexer la page, follow = suivre les liens -->
+<meta name="robots" content="index, follow" />
+
+<!-- CANONICAL : URL officielle (evite le contenu duplique) -->
+<link rel="canonical" href="https://quizmaster.app/" />
+```
+
+**Pourquoi ces choix ?**
+
+| Meta tag | Role | Impact SEO |
+|----------|------|------------|
+| `<title>` | Titre dans Google | CRITIQUE - 1er facteur de clic |
+| `description` | Resume dans Google | IMPORTANT - 2e facteur de clic |
+| `keywords` | Mots-cles | FAIBLE - Google ne l'utilise plus |
+| `robots` | Controle indexation | IMPORTANT - evite pages privees |
+| `canonical` | URL unique | IMPORTANT - evite penalites |
+
+#### 2. Open Graph (partage reseaux sociaux)
+
+Les balises **Open Graph** controlent l'apercu quand quelqu'un partage le lien sur Facebook, LinkedIn, etc.
+
+```html
+<!-- Type de contenu -->
+<meta property="og:type" content="website" />
+
+<!-- URL partagee -->
+<meta property="og:url" content="https://quizmaster.app/" />
+
+<!-- Titre de l'apercu (peut differer du <title>) -->
+<meta property="og:title" content="QuizMaster - Creez des quiz interactifs" />
+
+<!-- Description de l'apercu -->
+<meta property="og:description" content="Plateforme de creation de quiz..." />
+
+<!-- Image de l'apercu (1200x630 pixels recommandes) -->
+<meta property="og:image" content="https://quizmaster.app/og-image.png" />
+
+<!-- Langue -->
+<meta property="og:locale" content="fr_FR" />
+```
+
+**Resultat visuel sur Facebook :**
+```
+┌─────────────────────────────────────┐
+│  [Image og-image.png]               │
+│                                     │
+│  QuizMaster - Creez des quiz...     │
+│  Plateforme de creation de quiz...  │
+│  quizmaster.app                     │
+└─────────────────────────────────────┘
+```
+
+#### 3. Twitter Card
+
+Meme principe que Open Graph mais pour Twitter/X :
+
+```html
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="QuizMaster - Quiz interactifs" />
+<meta name="twitter:description" content="Creez des quiz..." />
+<meta name="twitter:image" content="https://quizmaster.app/og-image.png" />
+```
+
+#### 4. CSR vs SSR : Comprendre le rendu des pages
+
+Avant d'expliquer notre solution SEO, il faut comprendre les deux types de rendu web.
+
+##### CSR - Client-Side Rendering (Rendu cote client)
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                         CSR - Comment ca marche                  │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  1. Navigateur demande la page                                   │
+│     GET https://quizmaster.app/                                  │
+│                        │                                         │
+│                        ▼                                         │
+│  2. Serveur renvoie un HTML VIDE + JavaScript                    │
+│     <html>                                                       │
+│       <body>                                                     │
+│         <div id="app"></div>  ← Vide !                          │
+│         <script src="app.js"></script>                          │
+│       </body>                                                    │
+│     </html>                                                      │
+│                        │                                         │
+│                        ▼                                         │
+│  3. JavaScript s'execute dans le NAVIGATEUR                      │
+│     → Appelle l'API                                              │
+│     → Construit le HTML                                          │
+│     → Affiche le contenu                                         │
+│                                                                  │
+│  PROBLEME SEO : Google voit le HTML vide au debut !              │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**C'est ce que fait Vue.js par defaut (notre cas).**
+
+| Avantages CSR | Inconvenients CSR |
+|---------------|-------------------|
+| Navigation rapide entre pages | Premier chargement lent |
+| Moins de charge serveur | SEO plus difficile |
+| Experience interactive | Contenu invisible sans JS |
+| Deploiement simple (fichiers statiques) | Meta tags statiques |
+
+##### SSR - Server-Side Rendering (Rendu cote serveur)
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                         SSR - Comment ca marche                  │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  1. Navigateur demande la page                                   │
+│     GET https://quizmaster.app/                                  │
+│                        │                                         │
+│                        ▼                                         │
+│  2. SERVEUR execute JavaScript et construit le HTML              │
+│     → Appelle l'API                                              │
+│     → Genere le HTML complet                                     │
+│                        │                                         │
+│                        ▼                                         │
+│  3. Serveur renvoie le HTML COMPLET                              │
+│     <html>                                                       │
+│       <head>                                                     │
+│         <title>QuizMaster - Accueil</title>                     │
+│         <meta name="description" content="...">                 │
+│       </head>                                                    │
+│       <body>                                                     │
+│         <div id="app">                                           │
+│           <h1>Bienvenue sur QuizMaster</h1>  ← Deja la !        │
+│           <p>Contenu complet...</p>                             │
+│         </div>                                                   │
+│       </body>                                                    │
+│     </html>                                                      │
+│                                                                  │
+│  AVANTAGE SEO : Google voit tout le contenu immediatement !      │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**C'est ce que font Nuxt.js (Vue) ou Next.js (React).**
+
+| Avantages SSR | Inconvenients SSR |
+|---------------|-------------------|
+| SEO optimal | Configuration plus complexe |
+| Premier affichage rapide | Necessite un serveur Node.js |
+| Meta tags dynamiques natifs | Plus de charge serveur |
+| Contenu visible sans JS | Deploiement plus complexe |
+
+##### Comparaison visuelle
+
+```
+                    CSR (Vue.js)              SSR (Nuxt.js)
+                    ─────────────             ─────────────
+Serveur             Fichiers statiques        Serveur Node.js
+                           │                         │
+                           ▼                         ▼
+HTML initial        <div id="app"></div>      <div id="app">
+                    (vide)                      <h1>Contenu</h1>
+                                                <p>Complet</p>
+                                              </div>
+                           │                         │
+                           ▼                         ▼
+Google voit         Page vide                 Page complete
+                    (puis JS s'execute)       (immediatement)
+                           │                         │
+                           ▼                         ▼
+SEO                 Difficile                 Optimal
+```
+
+##### Pourquoi nous avons choisi CSR (Vue.js simple)
+
+| Critere | Notre choix | Raison |
+|---------|-------------|--------|
+| Simplicite | ✅ CSR | Pas besoin de serveur Node.js en prod |
+| Deploiement | ✅ CSR | Fichiers statiques sur n'importe quel hebergeur |
+| Cout | ✅ CSR | Hebergement gratuit possible (Netlify, Vercel) |
+| SEO | ⚠️ Compromis | Contourne avec `useSeo` composable |
+
+**Notre solution** : Utiliser CSR avec un composable qui met a jour dynamiquement les meta tags. Ce n'est pas aussi bon que SSR pour le SEO, mais c'est suffisant pour notre application.
+
+##### Alternatives SSR pour Vue.js
+
+Si le SEO etait critique (blog, e-commerce), on utiliserait :
+
+| Framework | Description |
+|-----------|-------------|
+| **Nuxt.js** | Framework SSR pour Vue.js |
+| **Vite SSR** | Plugin SSR pour Vite |
+| **Quasar SSR** | Mode SSR de Quasar |
+
+```javascript
+// Exemple avec Nuxt.js (SSR)
+// pages/index.vue
+export default {
+  head() {
+    return {
+      title: 'QuizMaster - Accueil',
+      meta: [
+        { name: 'description', content: '...' }
+      ]
+    }
+  }
+}
+// → Le serveur genere le HTML avec les meta tags
+```
+
+#### 5. Composable `useSeo` pour les meta dynamiques (notre solution CSR)
+
+**Le probleme des SPA (Single Page Application) :**
+
+Vue.js est une SPA en mode CSR : il n'y a qu'un seul fichier HTML charge une fois. Les meta tags ne changent pas quand on navigue entre les pages. Resultat : toutes les pages ont le meme titre dans Google.
+
+**La solution : `useSeo` composable**
+
+J'ai cree un composable Vue qui met a jour dynamiquement les meta tags :
+
+```javascript
+// src/composables/useSeo.js
+
+export function useSeo(options = {}) {
+  // Mettre a jour le titre
+  document.title = options.title
+
+  // Mettre a jour la meta description
+  updateMetaTag('name', 'description', options.description)
+
+  // Mettre a jour Open Graph
+  updateMetaTag('property', 'og:title', options.title)
+  updateMetaTag('property', 'og:description', options.description)
+
+  // Mettre a jour Twitter Card
+  updateMetaTag('name', 'twitter:title', options.title)
+  updateMetaTag('name', 'twitter:description', options.description)
+}
+
+// Presets pour chaque page
+export const seoPresets = {
+  home: {
+    title: 'QuizMaster - Creez et partagez des quiz interactifs',
+    description: 'Plateforme gratuite pour creer des quiz educatifs...'
+  },
+  auth: {
+    title: 'Connexion - QuizMaster',
+    description: 'Connectez-vous ou creez un compte QuizMaster...'
+  },
+  dashboard: {
+    title: 'Tableau de bord - QuizMaster',
+    description: 'Gerez vos quiz, consultez vos resultats...'
+  }
+  // ...
+}
+```
+
+**Utilisation dans les vues :**
+
+```javascript
+// src/views/HomeView.vue
+import { useSeo, seoPresets } from '../composables/useSeo'
+
+// Appele au chargement de la page
+useSeo(seoPresets.home)
+```
+
+**Resultat :** Chaque page a son propre titre et description.
+
+#### 6. HTML Semantique
+
+Le **HTML semantique** utilise des balises qui decrivent le contenu, pas juste sa presentation.
+
+```html
+<!-- AVANT (non semantique) -->
+<div class="header">...</div>
+<div class="content">...</div>
+<div class="footer">...</div>
+
+<!-- APRES (semantique) -->
+<header>...</header>
+<main>...</main>
+<footer>...</footer>
+```
+
+**Balises semantiques utilisees :**
+
+| Balise | Role | Pourquoi |
+|--------|------|----------|
+| `<main>` | Contenu principal | 1 seul par page, aide les lecteurs d'ecran |
+| `<section>` | Section thematique | Structure logique du contenu |
+| `<article>` | Contenu autonome | Peut etre extrait et reste comprehensible |
+| `<nav>` | Navigation | Identifie les menus |
+| `<header>` | En-tete | Logo, titre, navigation principale |
+| `<footer>` | Pied de page | Liens, copyright |
+
+**Attributs ARIA ajoutes :**
+
+```html
+<!-- Lier une section a son titre -->
+<section aria-labelledby="features-title">
+  <h2 id="features-title">Fonctionnalites</h2>
+</section>
+
+<!-- Annoncer les erreurs aux lecteurs d'ecran -->
+<p role="alert" v-if="error">{{ error }}</p>
+
+<!-- Cacher les emojis decoratifs -->
+<span aria-hidden="true">📝</span>
+
+<!-- Label invisible pour les inputs -->
+<label for="email" class="sr-only">Email</label>
+<input id="email" type="email" />
+```
+
+#### 7. Fichier `robots.txt`
+
+Le fichier `robots.txt` donne des instructions aux robots d'indexation.
+
+```
+# robots.txt
+User-agent: *        # Tous les robots
+
+Allow: /             # Indexer la page d'accueil
+Allow: /auth         # Indexer la page de connexion
+
+Disallow: /dashboard # NE PAS indexer (prive)
+Disallow: /play      # NE PAS indexer (necessite code)
+Disallow: /payment   # NE PAS indexer (paiement)
+Disallow: /api/      # NE PAS indexer (API)
+
+Sitemap: https://quizmaster.app/sitemap.xml
+```
+
+**Pourquoi exclure certaines pages ?**
+
+| Page | Raison de l'exclusion |
+|------|----------------------|
+| `/dashboard` | Contenu prive, necessite authentification |
+| `/play` | Necessite un code de quiz |
+| `/payment` | Page de paiement, pas utile dans Google |
+| `/api/` | Endpoints techniques, pas pour les humains |
+
+#### 8. Fichier `sitemap.xml`
+
+Le **sitemap** liste toutes les pages publiques avec leur importance.
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <!-- Page d'accueil - Priorite maximale -->
+  <url>
+    <loc>https://quizmaster.app/</loc>
+    <lastmod>2024-01-01</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- Page d'authentification -->
+  <url>
+    <loc>https://quizmaster.app/auth</loc>
+    <lastmod>2024-01-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+</urlset>
+```
+
+**Explications des balises :**
+
+| Balise | Valeur | Signification |
+|--------|--------|---------------|
+| `<loc>` | URL | Adresse de la page |
+| `<lastmod>` | Date | Derniere modification |
+| `<changefreq>` | weekly | Frequence de mise a jour |
+| `<priority>` | 0.0-1.0 | Importance relative |
+
+### Fichiers crees pour le SEO
+
+| Fichier | Emplacement | Role |
+|---------|-------------|------|
+| `index.html` | `frontend/` | Meta tags statiques |
+| `useSeo.js` | `frontend/src/composables/` | Meta tags dynamiques |
+| `robots.txt` | `frontend/public/` | Instructions robots |
+| `sitemap.xml` | `frontend/public/` | Plan du site |
+
+### Vues modifiees
+
+Chaque vue importe maintenant le composable SEO :
+
+```javascript
+// Toutes les vues
+import { useSeo, seoPresets } from '../composables/useSeo'
+useSeo(seoPresets.nomDeLaPage)
+```
+
+| Vue | Titre SEO |
+|-----|-----------|
+| HomeView | "QuizMaster - Creez et partagez des quiz interactifs" |
+| AuthView | "Connexion - QuizMaster" |
+| DashboardView | "Tableau de bord - QuizMaster" |
+| CreateQuizView | "Creer un quiz - QuizMaster" |
+| PlayQuizView | "Jouer - QuizMaster" |
+| PaymentView | "Passer Premium - QuizMaster" |
+
+### Outils de verification SEO
+
+Pour verifier que le SEO est bien configure :
+
+| Outil | URL | Ce qu'il verifie |
+|-------|-----|------------------|
+| Google Search Console | search.google.com/search-console | Indexation, erreurs |
+| PageSpeed Insights | pagespeed.web.dev | Performance, SEO |
+| Meta Tags Preview | metatags.io | Apercu Open Graph |
+| Twitter Card Validator | cards-dev.twitter.com/validator | Apercu Twitter |
+
+---
+
+## 12. Installation et lancement
 
 ### Prerequis
 
@@ -1967,7 +2420,9 @@ Ce projet QuizMaster couvre les competences suivantes :
 - ✅ Consommation d'API securisee avec Axios
 - ✅ Interface responsive avec Tailwind CSS
 - ✅ Formulaires avec validation
-- ✅ Tests frontend (128 tests avec Vitest + Vue Test Utils)
+- ✅ Tests frontend (149 tests avec Vitest + Vue Test Utils)
+- ✅ SEO complet (meta tags, Open Graph, sitemap, robots.txt)
+- ✅ HTML semantique et accessibilite de base (ARIA)
 
 ### Industrialisation
 - ✅ ESLint pour la qualite du code (backend + frontend)
@@ -1976,7 +2431,6 @@ Ce projet QuizMaster couvre les competences suivantes :
 - ✅ GitHub Actions CI/CD (lint, format, tests, build)
 
 ### Points d'amelioration possibles
-- Accessibilite (ARIA, navigation clavier)
-- SEO (meta tags, sitemap)
-- Docker pour le deploiement
+- Accessibilite avancee (navigation clavier complete, skip links)
 - Rate limiting pour la securite
+- Monitoring et logging

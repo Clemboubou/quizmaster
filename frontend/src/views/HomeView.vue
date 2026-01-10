@@ -3,6 +3,11 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useQuizStore } from '../stores/quiz'
 import { useAuthStore } from '../stores/auth'
+import { useSeo, seoPresets } from '../composables/useSeo'
+
+// SEO : Definir les meta tags pour cette page
+// Ceci est important car Google et les reseaux sociaux liront ces informations
+useSeo(seoPresets.home)
 
 const router = useRouter()
 const quizStore = useQuizStore()
@@ -33,13 +38,17 @@ async function joinQuiz() {
 </script>
 
 <template>
-  <div class="min-h-[calc(100vh-4rem)] flex flex-col">
-    <!-- Hero Section -->
+  <!-- SEMANTIC HTML : <main> indique le contenu principal de la page -->
+  <!-- Ceci aide les lecteurs d'ecran et ameliore le SEO -->
+  <main class="min-h-[calc(100vh-4rem)] flex flex-col">
+    <!-- Hero Section avec role="banner" pour l'accessibilite -->
     <section
+      aria-labelledby="hero-title"
       class="flex-1 flex items-center justify-center bg-gradient-to-br from-primary-50 to-primary-100"
     >
       <div class="max-w-4xl mx-auto px-4 py-16 text-center">
-        <h1 class="text-5xl font-bold text-gray-900 mb-6">
+        <!-- H1 unique par page : CRITIQUE pour le SEO -->
+        <h1 id="hero-title" class="text-5xl font-bold text-gray-900 mb-6">
           Bienvenue sur
           <span class="text-primary-600">QuizMaster</span>
         </h1>
@@ -49,27 +58,41 @@ async function joinQuiz() {
 
         <!-- Join Quiz Form -->
         <div class="max-w-md mx-auto">
-          <div class="card">
+          <article class="card">
             <h2 class="text-lg font-semibold text-gray-900 mb-4">Rejoindre un quiz</h2>
 
-            <form class="space-y-4" @submit.prevent="joinQuiz">
+            <form
+              class="space-y-4"
+              aria-label="Formulaire pour rejoindre un quiz"
+              @submit.prevent="joinQuiz"
+            >
               <div>
+                <label for="access-code" class="sr-only">Code d'acces du quiz</label>
                 <input
+                  id="access-code"
                   v-model="accessCode"
                   type="text"
                   placeholder="Entrez le code d'acces"
                   class="input text-center text-2xl tracking-widest uppercase"
                   maxlength="5"
+                  aria-describedby="code-error"
+                  autocomplete="off"
                 />
               </div>
 
-              <p v-if="error" class="error-text">{{ error }}</p>
+              <!-- role="alert" annonce l'erreur aux lecteurs d'ecran -->
+              <p v-if="error" id="code-error" role="alert" class="error-text">{{ error }}</p>
 
-              <button type="submit" :disabled="loading" class="btn btn-primary w-full py-3">
+              <button
+                type="submit"
+                :disabled="loading"
+                :aria-busy="loading"
+                class="btn btn-primary w-full py-3"
+              >
                 {{ loading ? 'Chargement...' : 'Rejoindre' }}
               </button>
             </form>
-          </div>
+          </article>
         </div>
 
         <!-- CTA for professors -->
@@ -80,33 +103,34 @@ async function joinQuiz() {
       </div>
     </section>
 
-    <!-- Features Section -->
-    <section class="py-16 bg-white">
+    <!-- Features Section avec aria-labelledby -->
+    <section aria-labelledby="features-title" class="py-16 bg-white">
       <div class="max-w-6xl mx-auto px-4">
-        <h2 class="text-3xl font-bold text-center text-gray-900 mb-12">
+        <h2 id="features-title" class="text-3xl font-bold text-center text-gray-900 mb-12">
           Pourquoi choisir QuizMaster ?
         </h2>
 
-        <div class="grid md:grid-cols-3 gap-8">
-          <div class="text-center">
-            <div class="text-4xl mb-4">&#x1F4DD;</div>
+        <!-- Liste de fonctionnalites avec role="list" implicite -->
+        <div class="grid md:grid-cols-3 gap-8" role="list">
+          <article role="listitem" class="text-center">
+            <div class="text-4xl mb-4" aria-hidden="true">&#x1F4DD;</div>
             <h3 class="text-lg font-semibold mb-2">Facile a creer</h3>
             <p class="text-gray-600">Creez des quiz QCM ou Vrai/Faux en quelques minutes</p>
-          </div>
+          </article>
 
-          <div class="text-center">
-            <div class="text-4xl mb-4">&#x1F517;</div>
+          <article role="listitem" class="text-center">
+            <div class="text-4xl mb-4" aria-hidden="true">&#x1F517;</div>
             <h3 class="text-lg font-semibold mb-2">Partage simplifie</h3>
             <p class="text-gray-600">Un code a 5 caracteres suffit pour rejoindre un quiz</p>
-          </div>
+          </article>
 
-          <div class="text-center">
-            <div class="text-4xl mb-4">&#x1F4CA;</div>
+          <article role="listitem" class="text-center">
+            <div class="text-4xl mb-4" aria-hidden="true">&#x1F4CA;</div>
             <h3 class="text-lg font-semibold mb-2">Resultats detailles</h3>
             <p class="text-gray-600">Suivez les performances de vos eleves en temps reel</p>
-          </div>
+          </article>
         </div>
       </div>
     </section>
-  </div>
+  </main>
 </template>
