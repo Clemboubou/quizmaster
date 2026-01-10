@@ -126,22 +126,36 @@ function cancelQuestionForm() {
     </div>
 
     <template v-else>
-      <!-- Quiz Title -->
+      <!--
+        ACCESSIBILITE : Formulaire du quiz
+        - Label lie au champ par for/id
+        - aria-describedby pour les erreurs
+        - aria-invalid pour l'etat d'erreur
+      -->
       <div class="card mb-6">
-        <h2 class="text-lg font-semibold mb-4">Informations du quiz</h2>
+        <h2 id="quiz-info-heading" class="text-lg font-semibold mb-4">Informations du quiz</h2>
 
-        <div class="flex space-x-4">
+        <div class="flex space-x-4" role="group" aria-labelledby="quiz-info-heading">
           <div class="flex-1">
+            <label for="quiz-title" class="sr-only">Titre du quiz</label>
             <input
+              id="quiz-title"
               v-model="title"
               type="text"
               class="input"
               placeholder="Titre du quiz (5-100 caracteres)"
+              :aria-describedby="titleError ? 'title-error' : 'title-hint'"
+              :aria-invalid="!!titleError"
             />
-            <p v-if="titleError" class="error-text">{{ titleError }}</p>
+            <p id="title-hint" class="sr-only">Le titre doit contenir entre 5 et 100 caracteres</p>
+            <p v-if="titleError" id="title-error" role="alert" class="error-text">
+              {{ titleError }}
+            </p>
           </div>
           <button
+            type="button"
             :disabled="!canSave || saving"
+            :aria-busy="saving"
             class="btn btn-primary"
             :class="{ 'opacity-50 cursor-not-allowed': !canSave || saving }"
             @click="saveQuiz"
@@ -150,7 +164,7 @@ function cancelQuestionForm() {
           </button>
         </div>
 
-        <p v-if="error" class="error-text mt-2">{{ error }}</p>
+        <p v-if="error" role="alert" aria-live="polite" class="error-text mt-2">{{ error }}</p>
       </div>
 
       <!-- Questions Section (only visible after quiz creation) -->

@@ -13,7 +13,8 @@
 9. [Tests](#9-tests)
 10. [Industrialisation (ESLint, Prettier, CI/CD)](#10-industrialisation-eslint-prettier-cicd)
 11. [SEO et Referencement](#11-seo-et-referencement)
-12. [Installation et lancement](#12-installation-et-lancement)
+12. [Accessibilite (a11y)](#12-accessibilite-a11y)
+13. [Installation et lancement](#13-installation-et-lancement)
 
 ---
 
@@ -2323,7 +2324,489 @@ Pour verifier que le SEO est bien configure :
 
 ---
 
-## 12. Installation et lancement
+## 12. Accessibilite (a11y)
+
+### Qu'est-ce que l'accessibilite web ?
+
+L'**accessibilite web** (souvent abregee **a11y** car il y a 11 lettres entre le "a" et le "y" de "accessibility") consiste a rendre les sites web utilisables par tous, y compris les personnes en situation de handicap.
+
+**Les differents types de handicaps concernes :**
+
+| Type de handicap | Exemple | Solution d'accessibilite |
+|-----------------|---------|--------------------------|
+| Visuel | Aveugles, malvoyants | Lecteurs d'ecran, contraste eleve |
+| Moteur | Difficulte a utiliser une souris | Navigation clavier complete |
+| Auditif | Sourds, malentendants | Sous-titres, transcriptions |
+| Cognitif | Dyslexie, TDAH | Contenu clair, structure logique |
+
+### Pourquoi c'est important ?
+
+| Raison | Impact |
+|--------|--------|
+| **Ethique** | Tout le monde a droit d'acceder a l'information |
+| **Legal** | RGAA en France, WCAG internationalement (obligatoire pour les sites publics) |
+| **SEO** | Google favorise les sites accessibles |
+| **UX** | Ameliore l'experience pour TOUS les utilisateurs |
+| **Business** | 15% de la population mondiale a un handicap |
+
+### Les standards : WCAG 2.1
+
+Les **WCAG** (Web Content Accessibility Guidelines) sont les standards internationaux d'accessibilite. Ils definissent 3 niveaux :
+
+| Niveau | Description | Obligation |
+|--------|-------------|------------|
+| **A** | Minimum vital | Obligatoire |
+| **AA** | Standard recommande | Exige par le RGAA |
+| **AAA** | Excellence | Optionnel |
+
+**Les 4 principes WCAG (POUR) :**
+
+1. **Perceptible** : Le contenu doit etre perceptible par tous (texte alternatif, contrastes)
+2. **Operable** : L'interface doit etre utilisable (navigation clavier, pas de temps limite)
+3. **Understandable** : Le contenu doit etre comprehensible (langage clair, erreurs explicites)
+4. **Robust** : Le code doit etre compatible avec les technologies d'assistance
+
+### Ce que nous avons implemente
+
+#### 1. Skip Link (Lien d'evitement)
+
+**Critere WCAG : 2.4.1 - Bypass Blocks (Niveau A)**
+
+Le **skip link** est un lien invisible qui apparait quand on appuie sur Tab. Il permet aux utilisateurs de clavier de sauter directement au contenu principal sans naviguer a travers le menu.
+
+**Pourquoi c'est necessaire ?**
+
+Imaginez un utilisateur aveugle : a chaque changement de page, il devrait ecouter et naviguer a travers TOUT le menu de navigation avant d'atteindre le contenu. Avec 10 liens dans le menu, ca fait 10 pressions sur Tab a chaque page !
+
+**Implementation dans `App.vue` :**
+
+```vue
+<template>
+  <div class="min-h-screen bg-gray-50">
+    <!--
+      SKIP LINK : Premier element focusable
+      - sr-only : Cache visuellement mais accessible aux lecteurs d'ecran
+      - focus:not-sr-only : Apparait quand il recoit le focus
+      - Lien vers #main-content
+    -->
+    <a
+      href="#main-content"
+      class="sr-only focus:not-sr-only focus:absolute focus:top-0
+             focus:left-0 focus:z-50 focus:bg-primary-600 focus:text-white
+             focus:px-4 focus:py-2 focus:text-lg focus:font-semibold"
+    >
+      Aller au contenu principal
+    </a>
+
+    <Navbar />
+
+    <!--
+      MAIN : Cible du skip link
+      - id="main-content" : Correspond au href du skip link
+      - tabindex="-1" : Permet de recevoir le focus programmatiquement
+    -->
+    <main id="main-content" tabindex="-1" class="focus:outline-none">
+      <RouterView />
+    </main>
+  </div>
+</template>
+```
+
+**Comment le tester ?**
+1. Ouvrir l'application dans le navigateur
+2. Appuyer sur Tab immediatement
+3. Le lien "Aller au contenu principal" apparait en haut a gauche
+4. Appuyer sur Entree pour sauter au contenu
+
+#### 2. Focus Visible (Indicateur de focus)
+
+**Critere WCAG : 2.4.7 - Focus Visible (Niveau AA)**
+
+Les utilisateurs de clavier doivent TOUJOURS voir quel element est selectionne. C'est l'equivalent visuel du survol de souris.
+
+**Pourquoi c'est critique ?**
+
+Sans indicateur de focus visible, un utilisateur de clavier ne sait pas ou il se trouve dans la page. C'est comme naviguer a l'aveugle.
+
+**Configuration Tailwind (`tailwind.config.js`) :**
+
+```javascript
+export default {
+  theme: {
+    extend: {
+      // Ring de focus plus visible
+      ringWidth: {
+        DEFAULT: '3px'  // Plus epais que les 2px par defaut
+      },
+      ringOffsetWidth: {
+        DEFAULT: '2px'  // Espace entre l'element et le ring
+      }
+    }
+  }
+}
+```
+
+**Classes Tailwind utilisees :**
+
+```html
+<!-- Bouton avec focus visible -->
+<button class="focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:outline-none">
+  Cliquer
+</button>
+
+<!-- Input avec focus visible -->
+<input class="focus:ring-2 focus:ring-primary-500 focus:outline-none" />
+```
+
+**Resultat visuel :**
+
+```
+┌──────────────────────┐
+│      [Bouton]        │  ← Etat normal
+└──────────────────────┘
+
+┌──────────────────────┐
+│  ┌──[Bouton]───┐     │  ← Etat focus : anneau bleu de 3px
+│  │             │     │
+│  └─────────────┘     │
+└──────────────────────┘
+```
+
+#### 3. Labels accessibles pour les formulaires
+
+**Critere WCAG : 1.3.1 - Info and Relationships (Niveau A)**
+**Critere WCAG : 3.3.2 - Labels or Instructions (Niveau A)**
+
+Chaque champ de formulaire doit etre associe a un label qui decrit sa fonction.
+
+**Pourquoi c'est important ?**
+
+Un lecteur d'ecran annonce le label quand l'utilisateur arrive sur un champ. Sans label, il dit juste "champ de texte" ce qui n'aide pas.
+
+**Implementation dans `AuthView.vue` :**
+
+```vue
+<template>
+  <form aria-label="Formulaire d'authentification">
+    <!--
+      CHAMP EMAIL : Liaison label-input via for/id
+      - for="auth-email" correspond a id="auth-email"
+      - aria-describedby pointe vers l'id du message d'erreur
+      - aria-invalid indique si le champ est en erreur
+    -->
+    <div>
+      <label for="auth-email" class="block text-sm font-medium">
+        Email
+      </label>
+      <input
+        id="auth-email"
+        v-model="email"
+        type="email"
+        autocomplete="email"
+        :aria-describedby="emailError ? 'email-error' : undefined"
+        :aria-invalid="!!emailError"
+      />
+      <p
+        v-if="emailError"
+        id="email-error"
+        role="alert"
+        class="error-text"
+      >
+        {{ emailError }}
+      </p>
+    </div>
+
+    <!--
+      GROUPE RADIO : Utiliser fieldset/legend
+      - fieldset groupe semantiquement les radios
+      - legend donne un titre au groupe
+    -->
+    <fieldset>
+      <legend>Je suis</legend>
+      <div role="radiogroup">
+        <label for="role-eleve">
+          <input id="role-eleve" type="radio" name="role" value="eleve" />
+          Eleve
+        </label>
+        <label for="role-prof">
+          <input id="role-prof" type="radio" name="role" value="prof" />
+          Professeur
+        </label>
+      </div>
+    </fieldset>
+  </form>
+</template>
+```
+
+**Attributs ARIA utilises :**
+
+| Attribut | Role | Exemple |
+|----------|------|---------|
+| `aria-label` | Label invisible | `aria-label="Fermer"` |
+| `aria-labelledby` | Reference un element visible | `aria-labelledby="title-id"` |
+| `aria-describedby` | Description supplementaire | `aria-describedby="error-id"` |
+| `aria-invalid` | Indique une erreur | `aria-invalid="true"` |
+
+#### 4. Navigation clavier complete
+
+**Critere WCAG : 2.1.1 - Keyboard (Niveau A)**
+
+Toutes les fonctionnalites doivent etre utilisables au clavier, sans souris.
+
+**Raccourcis implementes dans `QuestionDisplay.vue` :**
+
+```vue
+<template>
+  <div class="space-y-3" role="radiogroup">
+    <button
+      v-for="(option, index) in options"
+      :key="index"
+      type="button"
+      role="radio"
+      :aria-checked="selectedAnswer === option"
+      @click="selectedAnswer = option"
+      @keydown.1="options[0] && (selectedAnswer = options[0])"
+      @keydown.2="options[1] && (selectedAnswer = options[1])"
+      @keydown.3="options[2] && (selectedAnswer = options[2])"
+      @keydown.4="options[3] && (selectedAnswer = options[3])"
+      @keydown.a="options[0] && (selectedAnswer = options[0])"
+      @keydown.b="options[1] && (selectedAnswer = options[1])"
+      @keydown.c="options[2] && (selectedAnswer = options[2])"
+      @keydown.d="options[3] && (selectedAnswer = options[3])"
+    >
+      {{ String.fromCharCode(65 + index) }}. {{ option }}
+    </button>
+  </div>
+</template>
+```
+
+**Touches disponibles :**
+
+| Touche | Action |
+|--------|--------|
+| Tab | Naviguer entre les elements |
+| Entree | Activer un bouton/lien |
+| Espace | Cocher une case, activer un bouton |
+| 1, 2, 3, 4 | Selectionner option 1, 2, 3 ou 4 |
+| A, B, C, D | Selectionner option A, B, C ou D |
+| Echap | Fermer une modale |
+
+#### 5. ARIA Live Regions (Annonces dynamiques)
+
+**Critere WCAG : 4.1.3 - Status Messages (Niveau AA)**
+
+Les contenus qui changent dynamiquement doivent etre annonces aux lecteurs d'ecran.
+
+**Les valeurs de `aria-live` :**
+
+| Valeur | Comportement | Usage |
+|--------|--------------|-------|
+| `off` | Pas d'annonce | Par defaut |
+| `polite` | Annonce quand l'utilisateur est inactif | Mises a jour non urgentes |
+| `assertive` | Interrompt immediatement | Erreurs, alertes critiques |
+
+**Implementation dans les composants :**
+
+```vue
+<!-- Message d'erreur : annonce immediate -->
+<p v-if="error" role="alert" aria-live="assertive">
+  {{ error }}
+</p>
+
+<!-- Changement de question : annonce polie -->
+<h2 aria-live="polite">
+  {{ question.question_text }}
+</h2>
+
+<!-- Score final : annonce du resultat -->
+<div role="status" aria-live="polite">
+  <span class="sr-only">
+    Vous avez obtenu {{ score }} bonnes reponses sur {{ total }}
+  </span>
+</div>
+```
+
+**Le role="alert" :**
+
+C'est equivalent a `aria-live="assertive"` + `aria-atomic="true"`. Ideal pour les messages d'erreur qui doivent etre annonces immediatement.
+
+#### 6. Barre de progression accessible
+
+**Critere WCAG : 1.3.1 - Info and Relationships (Niveau A)**
+
+Les barres de progression doivent indiquer leur valeur aux technologies d'assistance.
+
+**Implementation dans `QuestionDisplay.vue` :**
+
+```vue
+<div
+  role="progressbar"
+  :aria-valuenow="questionNumber"
+  :aria-valuemin="1"
+  :aria-valuemax="totalQuestions"
+  :aria-label="`Progression : question ${questionNumber} sur ${totalQuestions}`"
+>
+  <div
+    class="bg-primary-600 h-2 rounded-full"
+    :style="{ width: `${(questionNumber / totalQuestions) * 100}%` }"
+    aria-hidden="true"
+  ></div>
+</div>
+```
+
+**Attributs ARIA pour progressbar :**
+
+| Attribut | Role | Valeur |
+|----------|------|--------|
+| `role="progressbar"` | Identifie comme barre de progression | - |
+| `aria-valuenow` | Valeur actuelle | 3 |
+| `aria-valuemin` | Valeur minimum | 1 |
+| `aria-valuemax` | Valeur maximum | 10 |
+| `aria-label` | Description | "Question 3 sur 10" |
+
+#### 7. Elements decoratifs caches
+
+**Critere WCAG : 1.1.1 - Non-text Content (Niveau A)**
+
+Les elements purement decoratifs (emojis, icones) doivent etre caches des lecteurs d'ecran.
+
+**Implementation dans `ScoreDisplay.vue` :**
+
+```vue
+<!-- Emoji decoratif : cache aux lecteurs d'ecran -->
+<div aria-hidden="true">🏆</div>
+
+<!-- Score affiche visuellement -->
+<div aria-hidden="true">8 / 10</div>
+<div aria-hidden="true">80% de reussite</div>
+
+<!-- Version pour lecteurs d'ecran -->
+<span class="sr-only">
+  Vous avez obtenu 8 bonnes reponses sur 10 questions,
+  soit 80 pourcent de reussite.
+</span>
+```
+
+**La classe `sr-only` (Screen Reader Only) :**
+
+```css
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+```
+
+Cette classe cache visuellement l'element tout en le gardant accessible aux lecteurs d'ecran. L'inverse de `aria-hidden="true"`.
+
+### Fichiers modifies pour l'accessibilite
+
+| Fichier | Modifications |
+|---------|---------------|
+| `App.vue` | Skip link, id sur main |
+| `tailwind.config.js` | Ring de focus personnalise |
+| `AuthView.vue` | Labels, fieldset, aria-invalid |
+| `CreateQuizView.vue` | Labels, aria-describedby |
+| `QuestionForm.vue` | Labels, fieldset, role="radiogroup" |
+| `QuestionDisplay.vue` | Navigation clavier, progressbar, aria-live |
+| `ScoreDisplay.vue` | role="status", sr-only, aria-hidden |
+| `HomeView.vue` | HTML semantique, ARIA labelledby |
+
+### Comment tester l'accessibilite ?
+
+#### 1. Tests clavier
+
+1. Debrancher la souris
+2. Utiliser uniquement Tab, Entree, Espace, fleches
+3. Verifier que TOUT est accessible
+
+**Checklist clavier :**
+
+- [ ] Skip link apparait au premier Tab
+- [ ] Tous les liens/boutons sont focusables
+- [ ] L'ordre de focus est logique
+- [ ] Le focus est toujours visible
+- [ ] Les formulaires sont remplissables
+
+#### 2. Tests avec lecteur d'ecran
+
+| Outil | Plateforme | Gratuit |
+|-------|------------|---------|
+| NVDA | Windows | Oui |
+| VoiceOver | Mac/iOS | Integre |
+| TalkBack | Android | Integre |
+
+**Commandes NVDA basiques :**
+
+| Touche | Action |
+|--------|--------|
+| Ctrl | Arreter la lecture |
+| H | Titre suivant |
+| F | Formulaire suivant |
+| Tab | Element focusable suivant |
+
+#### 3. Outils automatiques
+
+| Outil | Type | Ce qu'il detecte |
+|-------|------|------------------|
+| axe DevTools | Extension Chrome | Problemes WCAG |
+| WAVE | Extension Chrome | Erreurs visuelles |
+| Lighthouse | Chrome DevTools | Score accessibilite |
+| eslint-plugin-jsx-a11y | ESLint | Erreurs dans le code |
+
+**Exemple avec Lighthouse :**
+
+1. Ouvrir Chrome DevTools (F12)
+2. Onglet "Lighthouse"
+3. Cocher "Accessibility"
+4. Cliquer "Analyze page load"
+5. Voir le score et les recommandations
+
+#### 4. Tests de contraste
+
+Les contrastes de couleur doivent respecter ces ratios minimums :
+
+| Type de texte | Ratio minimum | Niveau WCAG |
+|---------------|---------------|-------------|
+| Texte normal | 4.5:1 | AA |
+| Grand texte (18px+) | 3:1 | AA |
+| Elements graphiques | 3:1 | AA |
+
+**Outils de verification :**
+
+- [WebAIM Contrast Checker](https://webaim.org/resources/contrastchecker/)
+- [Colour Contrast Analyser](https://www.tpgi.com/color-contrast-checker/)
+
+### Resume des criteres WCAG implementes
+
+| Critere | Niveau | Description | Implementation |
+|---------|--------|-------------|----------------|
+| 1.1.1 | A | Alternatives textuelles | aria-hidden sur decoratif |
+| 1.3.1 | A | Information et relations | Labels, fieldset, ARIA |
+| 2.1.1 | A | Clavier | Navigation complete |
+| 2.4.1 | A | Bypass blocks | Skip link |
+| 2.4.7 | AA | Focus visible | Ring personnalise |
+| 3.3.2 | A | Labels ou instructions | for/id, aria-label |
+| 4.1.3 | AA | Messages de statut | aria-live, role="alert" |
+
+### Ressources pour approfondir
+
+| Ressource | URL | Description |
+|-----------|-----|-------------|
+| WCAG 2.1 | w3.org/WAI/WCAG21/quickref | Reference officielle |
+| MDN Accessibility | developer.mozilla.org/en-US/docs/Web/Accessibility | Guide Mozilla |
+| A11Y Project | a11yproject.com | Checklist et articles |
+| WebAIM | webaim.org | Articles et outils |
+| RGAA | accessibilite.numerique.gouv.fr | Standard francais |
+
+---
+
+## 13. Installation et lancement
 
 ### Prerequis
 
@@ -2422,7 +2905,17 @@ Ce projet QuizMaster couvre les competences suivantes :
 - ✅ Formulaires avec validation
 - ✅ Tests frontend (149 tests avec Vitest + Vue Test Utils)
 - ✅ SEO complet (meta tags, Open Graph, sitemap, robots.txt)
-- ✅ HTML semantique et accessibilite de base (ARIA)
+- ✅ HTML semantique et ARIA
+
+### Accessibilite (a11y)
+- ✅ Skip link (lien d'evitement)
+- ✅ Focus visible sur tous les elements interactifs
+- ✅ Labels accessibles sur tous les formulaires
+- ✅ Navigation clavier complete (Tab, Entree, raccourcis 1-4/A-D)
+- ✅ ARIA live regions (annonces dynamiques)
+- ✅ Barres de progression accessibles (role="progressbar")
+- ✅ Elements decoratifs caches (aria-hidden)
+- ✅ Criteres WCAG 2.1 niveau A et AA implementes
 
 ### Industrialisation
 - ✅ ESLint pour la qualite du code (backend + frontend)
@@ -2431,6 +2924,6 @@ Ce projet QuizMaster couvre les competences suivantes :
 - ✅ GitHub Actions CI/CD (lint, format, tests, build)
 
 ### Points d'amelioration possibles
-- Accessibilite avancee (navigation clavier complete, skip links)
 - Rate limiting pour la securite
 - Monitoring et logging
+- Tests automatises d'accessibilite (axe-core)

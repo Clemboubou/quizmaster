@@ -38,20 +38,56 @@ const emoji = computed(() => {
 </script>
 
 <template>
-  <div class="card max-w-md mx-auto text-center">
-    <div class="text-6xl mb-4">{{ emoji }}</div>
+  <!--
+    ACCESSIBILITE : Affichage du score accessible
+    ==============================================
+    - role="status" avec aria-live pour annoncer le resultat
+    - aria-hidden sur les elements decoratifs (emoji)
+    - Barre de progression avec role="progressbar"
+    - Score annonce de maniere claire pour les lecteurs d'ecran
+  -->
+  <div
+    class="card max-w-md mx-auto text-center"
+    role="status"
+    aria-live="polite"
+    aria-label="Resultat du quiz"
+  >
+    <!-- Emoji decoratif : cache aux lecteurs d'ecran -->
+    <div class="text-6xl mb-4" aria-hidden="true">{{ emoji }}</div>
 
     <h2 class="text-2xl font-bold text-gray-900 mb-2">{{ message }}</h2>
 
     <p v-if="quizTitle" class="text-gray-600 mb-6">{{ quizTitle }}</p>
 
+    <!--
+      SCORE : Accessible aux lecteurs d'ecran
+      Le texte sr-only fournit une description complete pour les lecteurs d'ecran
+    -->
     <div class="bg-gray-100 rounded-xl p-6 mb-6">
-      <div class="text-5xl font-bold text-primary-600">{{ score }} / {{ total }}</div>
-      <div class="text-gray-500 mt-2">{{ percentage }}% de reussite</div>
+      <div class="text-5xl font-bold text-primary-600" aria-hidden="true">
+        {{ score }} / {{ total }}
+      </div>
+      <div class="text-gray-500 mt-2" aria-hidden="true">{{ percentage }}% de reussite</div>
+      <!-- Version accessible pour lecteurs d'ecran -->
+      <span class="sr-only">
+        Vous avez obtenu {{ score }} bonnes reponses sur {{ total }} questions, soit
+        {{ percentage }} pourcent de reussite.
+      </span>
     </div>
 
-    <!-- Barre de progression -->
-    <div class="w-full bg-gray-200 rounded-full h-4 mb-6">
+    <!--
+      BARRE DE PROGRESSION : Avec role="progressbar"
+      - aria-valuenow pour la valeur actuelle
+      - aria-label pour decrire ce que represente la progression
+    -->
+    <div
+      class="w-full bg-gray-200 rounded-full h-4 mb-6"
+      role="progressbar"
+      :aria-valuenow="percentage"
+      aria-valuemin="0"
+      aria-valuemax="100"
+      :aria-label="`Score : ${percentage} pourcent`"
+    >
       <div
         class="h-4 rounded-full transition-all duration-500"
         :class="{
@@ -60,9 +96,16 @@ const emoji = computed(() => {
           'bg-red-500': percentage < 50
         }"
         :style="{ width: `${percentage}%` }"
+        aria-hidden="true"
       ></div>
     </div>
 
-    <button class="btn btn-primary w-full" @click="emit('back')">Retour au tableau de bord</button>
+    <button
+      type="button"
+      class="btn btn-primary w-full focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
+      @click="emit('back')"
+    >
+      Retour au tableau de bord
+    </button>
   </div>
 </template>
