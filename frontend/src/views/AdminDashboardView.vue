@@ -464,7 +464,7 @@ onMounted(async () => {
               <button
                 class="btn btn-secondary text-sm"
                 :disabled="usersPagination.page <= 1"
-                @click="usersPagination.page--; loadUsers()"
+                @click="(usersPagination.page--, loadUsers())"
               >
                 Precedent
               </button>
@@ -474,136 +474,131 @@ onMounted(async () => {
               <button
                 class="btn btn-secondary text-sm"
                 :disabled="usersPagination.page >= usersPagination.totalPages"
-                @click="usersPagination.page++; loadUsers()"
+                @click="(usersPagination.page++, loadUsers())"
               >
                 Suivant
               </button>
             </div>
           </div>
-          <!-- Logs Tab -->
-          <div v-if="activeTab === 'logs'" class="space-y-6">
-            <!-- Filters -->
-            <div class="card">
-              <div class="flex flex-wrap gap-4 items-end">
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">Action</label>
-                  <select v-model="logsFilters.action" class="input" @change="loadLogs">
-                    <option value="">Toutes</option>
-                    <option value="LOGIN">LOGIN</option>
-                    <option value="LOGIN_FAILED">LOGIN_FAILED</option>
-                    <option value="REGISTER">REGISTER</option>
-                    <option value="QUIZ_CREATED">QUIZ_CREATED</option>
-                    <option value="QUIZ_DELETED">QUIZ_DELETED</option>
-                    <option value="USER_CREATED">USER_CREATED</option>
-                    <option value="USER_UPDATED">USER_UPDATED</option>
-                    <option value="USER_DELETED">USER_DELETED</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">Date debut</label>
-                  <input v-model="logsFilters.start_date" type="date" class="input" />
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-1">Date fin</label>
-                  <input v-model="logsFilters.end_date" type="date" class="input" />
-                </div>
-                <button class="btn btn-primary" @click="loadLogs">Filtrer</button>
-              </div>
+        </div>
+      </div>
+
+      <!-- Logs Tab -->
+      <div v-if="activeTab === 'logs'" class="space-y-6">
+        <!-- Filters -->
+        <div class="card">
+          <div class="flex flex-wrap gap-4 items-end">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Action</label>
+              <select v-model="logsFilters.action" class="input" @change="loadLogs">
+                <option value="">Toutes</option>
+                <option value="LOGIN">LOGIN</option>
+                <option value="LOGIN_FAILED">LOGIN_FAILED</option>
+                <option value="REGISTER">REGISTER</option>
+                <option value="QUIZ_CREATED">QUIZ_CREATED</option>
+                <option value="QUIZ_DELETED">QUIZ_DELETED</option>
+                <option value="USER_CREATED">USER_CREATED</option>
+                <option value="USER_UPDATED">USER_UPDATED</option>
+                <option value="USER_DELETED">USER_DELETED</option>
+              </select>
             </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Date debut</label>
+              <input v-model="logsFilters.start_date" type="date" class="input" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Date fin</label>
+              <input v-model="logsFilters.end_date" type="date" class="input" />
+            </div>
+            <button class="btn btn-primary" @click="loadLogs">Filtrer</button>
+          </div>
+        </div>
 
-            <!-- Logs List -->
-            <div class="card overflow-hidden">
-              <div v-if="loadingLogs" class="text-center py-8">
-                <p class="text-gray-500">Chargement...</p>
-              </div>
+        <!-- Logs List -->
+        <div class="card overflow-hidden">
+          <div v-if="loadingLogs" class="text-center py-8">
+            <p class="text-gray-500">Chargement...</p>
+          </div>
 
-              <div v-else class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                  <thead class="bg-gray-50">
-                    <tr>
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                        Date
-                      </th>
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                        Action
-                      </th>
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                        Utilisateur
-                      </th>
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                        Cible
-                      </th>
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                        IP
-                      </th>
-                      <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                        Details
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody class="bg-white divide-y divide-gray-200">
-                    <tr v-for="log in logs" :key="log.id" class="hover:bg-gray-50">
-                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {{ formatDate(log.created_at) }}
-                      </td>
-                      <td class="px-6 py-4 whitespace-nowrap">
-                        <span
-                          :class="getActionBadge(log.action)"
-                          class="px-2 py-1 text-xs rounded-full"
-                        >
-                          {{ log.action }}
-                        </span>
-                      </td>
-                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {{ log.user_email || 'Anonyme' }}
-                      </td>
-                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        <span v-if="log.target_type">{{ log.target_type }} #{{ log.target_id }}</span>
-                        <span v-else>-</span>
-                      </td>
-                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {{ log.ip_address || '-' }}
-                      </td>
-                      <td class="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
-                        {{ log.details ? JSON.stringify(log.details) : '-' }}
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+          <div v-else class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    Date
+                  </th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    Action
+                  </th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    Utilisateur
+                  </th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    Cible
+                  </th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    IP
+                  </th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    Details
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr v-for="log in logs" :key="log.id" class="hover:bg-gray-50">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {{ formatDate(log.created_at) }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap">
+                    <span
+                      :class="getActionBadge(log.action)"
+                      class="px-2 py-1 text-xs rounded-full"
+                    >
+                      {{ log.action }}
+                    </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    {{ log.user_email || 'Anonyme' }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <span v-if="log.target_type">{{ log.target_type }} #{{ log.target_id }}</span>
+                    <span v-else>-</span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {{ log.ip_address || '-' }}
+                  </td>
+                  <td class="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
+                    {{ log.details ? JSON.stringify(log.details) : '-' }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
 
-              <!-- Pagination -->
-              <div
-                v-if="logsPagination.totalPages > 1"
-                class="px-6 py-4 border-t flex items-center justify-between"
+          <!-- Pagination -->
+          <div
+            v-if="logsPagination.totalPages > 1"
+            class="px-6 py-4 border-t flex items-center justify-between"
+          >
+            <span class="text-sm text-gray-500">{{ logsPagination.total }} logs</span>
+            <div class="flex space-x-2">
+              <button
+                class="btn btn-secondary text-sm"
+                :disabled="logsPagination.page <= 1"
+                @click="(logsPagination.page--, loadLogs())"
               >
-                <span class="text-sm text-gray-500">{{ logsPagination.total }} logs</span>
-                <div class="flex space-x-2">
-                  <button
-                    class="btn btn-secondary text-sm"
-                    :disabled="logsPagination.page <= 1"
-                    @click="
-                      logsPagination.page--
-                      loadLogs()
-                    "
-                  >
-                    Precedent
-                  </button>
-                  <span class="px-3 py-2 text-sm">
-                    {{ logsPagination.page }} / {{ logsPagination.totalPages }}
-                  </span>
-                  <button
-                    class="btn btn-secondary text-sm"
-                    :disabled="logsPagination.page >= logsPagination.totalPages"
-                    @click="
-                      logsPagination.page++
-                      loadLogs()
-                    "
-                  >
-                    Suivant
-                  </button>
-                </div>
-              </div>
+                Precedent
+              </button>
+              <span class="px-3 py-2 text-sm">
+                {{ logsPagination.page }} / {{ logsPagination.totalPages }}
+              </span>
+              <button
+                class="btn btn-secondary text-sm"
+                :disabled="logsPagination.page >= logsPagination.totalPages"
+                @click="(logsPagination.page++, loadLogs())"
+              >
+                Suivant
+              </button>
             </div>
           </div>
         </div>
