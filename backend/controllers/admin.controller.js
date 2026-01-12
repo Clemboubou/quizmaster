@@ -90,7 +90,12 @@ async function getDashboard(req, res) {
         })
     } catch (error) {
         console.error('Erreur getDashboard:', error)
-        return errorResponse(res, 'INTERNAL_ERROR', 'Erreur lors de la recuperation du dashboard', 500)
+        return errorResponse(
+            res,
+            'INTERNAL_ERROR',
+            'Erreur lors de la recuperation du dashboard',
+            500
+        )
     }
 }
 
@@ -143,20 +148,25 @@ async function getUsers(req, res) {
         )
 
         // Compter le total
-        const [countResult] = await pool.query(`SELECT COUNT(*) as total FROM users ${whereClause}`, params)
+        const [countResult] = await pool.query(
+            `SELECT COUNT(*) as total FROM users ${whereClause}`,
+            params
+        )
 
         // Ajouter des stats par utilisateur
         const usersWithStats = await Promise.all(
             users.map(async user => {
                 if (user.role === 'prof') {
-                    const [quizCount] = await pool.query('SELECT COUNT(*) as count FROM quizzes WHERE user_id = ?', [
-                        user.id
-                    ])
+                    const [quizCount] = await pool.query(
+                        'SELECT COUNT(*) as count FROM quizzes WHERE user_id = ?',
+                        [user.id]
+                    )
                     return { ...user, quiz_count: quizCount[0].count }
                 } else if (user.role === 'eleve') {
-                    const [resultCount] = await pool.query('SELECT COUNT(*) as count FROM results WHERE user_id = ?', [
-                        user.id
-                    ])
+                    const [resultCount] = await pool.query(
+                        'SELECT COUNT(*) as count FROM results WHERE user_id = ?',
+                        [user.id]
+                    )
                     return { ...user, result_count: resultCount[0].count }
                 }
                 return user
@@ -174,7 +184,12 @@ async function getUsers(req, res) {
         })
     } catch (error) {
         console.error('Erreur getUsers:', error)
-        return errorResponse(res, 'INTERNAL_ERROR', 'Erreur lors de la recuperation des utilisateurs', 500)
+        return errorResponse(
+            res,
+            'INTERNAL_ERROR',
+            'Erreur lors de la recuperation des utilisateurs',
+            500
+        )
     }
 }
 
@@ -247,7 +262,12 @@ async function getUserById(req, res) {
         })
     } catch (error) {
         console.error('Erreur getUserById:', error)
-        return errorResponse(res, 'INTERNAL_ERROR', 'Erreur lors de la recuperation de l utilisateur', 500)
+        return errorResponse(
+            res,
+            'INTERNAL_ERROR',
+            'Erreur lors de la recuperation de l utilisateur',
+            500
+        )
     }
 }
 
@@ -270,7 +290,12 @@ async function updateUser(req, res) {
 
         // Empecher de modifier son propre compte admin
         if (parseInt(id) === req.user.userId && role !== 'admin') {
-            return errorResponse(res, 'FORBIDDEN', 'Vous ne pouvez pas retirer vos droits admin', 403)
+            return errorResponse(
+                res,
+                'FORBIDDEN',
+                'Vous ne pouvez pas retirer vos droits admin',
+                403
+            )
         }
 
         // Construire la requete de mise a jour
@@ -302,7 +327,9 @@ async function updateUser(req, res) {
             // Logger le changement premium
             await log({
                 userId: req.user.userId,
-                action: is_premium ? LOG_ACTIONS.USER_PREMIUM_GRANTED : LOG_ACTIONS.USER_PREMIUM_REVOKED,
+                action: is_premium
+                    ? LOG_ACTIONS.USER_PREMIUM_GRANTED
+                    : LOG_ACTIONS.USER_PREMIUM_REVOKED,
                 targetType: 'user',
                 targetId: parseInt(id),
                 req
@@ -358,7 +385,12 @@ async function deleteUser(req, res) {
 
         // Empecher de supprimer son propre compte
         if (parseInt(id) === req.user.userId) {
-            return errorResponse(res, 'FORBIDDEN', 'Vous ne pouvez pas supprimer votre propre compte', 403)
+            return errorResponse(
+                res,
+                'FORBIDDEN',
+                'Vous ne pouvez pas supprimer votre propre compte',
+                403
+            )
         }
 
         // Verifier que l'utilisateur existe
@@ -454,7 +486,15 @@ async function createUser(req, res) {
  */
 async function getLogsController(req, res) {
     try {
-        const { page = 1, limit = 50, action, user_id, target_type, start_date, end_date } = req.query
+        const {
+            page = 1,
+            limit = 50,
+            action,
+            user_id,
+            target_type,
+            start_date,
+            end_date
+        } = req.query
 
         // Logger l'acces aux logs
         await log({

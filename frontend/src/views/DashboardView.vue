@@ -1,6 +1,5 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
-import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import { useQuizStore } from '../stores/quiz'
 import QuizCard from '../components/QuizCard.vue'
@@ -9,7 +8,6 @@ import { useSeo, seoPresets } from '../composables/useSeo'
 // SEO : Meta tags pour le tableau de bord
 useSeo(seoPresets.dashboard)
 
-const router = useRouter()
 const authStore = useAuthStore()
 const quizStore = useQuizStore()
 

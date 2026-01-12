@@ -69,8 +69,8 @@ async function finishQuiz() {
     if (authStore.isAuthenticated && authStore.isEleve) {
       await quizStore.submitResult(currentQuiz.value.id, score.value, answers.value)
     }
-  } catch (err) {
-    console.error('Error submitting result:', err)
+  } catch {
+    // Erreur silencieuse - le resultat n'a pas pu etre enregistre
   } finally {
     submitting.value = false
     isFinished.value = true

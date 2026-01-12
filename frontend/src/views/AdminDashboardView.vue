@@ -1,9 +1,6 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'
-import { useAuthStore } from '../stores/auth'
+import { ref, onMounted } from 'vue'
 import adminService from '../services/admin'
-
-const authStore = useAuthStore()
 
 // State
 const loading = ref(true)
@@ -260,21 +257,27 @@ onMounted(async () => {
         <!-- Stats Cards -->
         <div v-if="dashboardData" class="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div class="card text-center">
-            <div class="text-3xl font-bold text-primary-600">{{ dashboardData.users?.total || 0 }}</div>
+            <div class="text-3xl font-bold text-primary-600">
+              {{ dashboardData.users?.total || 0 }}
+            </div>
             <div class="text-sm text-gray-500">Utilisateurs</div>
             <div class="text-xs text-gray-400 mt-1">
               +{{ dashboardData.users?.new_this_week || 0 }} cette semaine
             </div>
           </div>
           <div class="card text-center">
-            <div class="text-3xl font-bold text-blue-600">{{ dashboardData.quizzes?.total || 0 }}</div>
+            <div class="text-3xl font-bold text-blue-600">
+              {{ dashboardData.quizzes?.total || 0 }}
+            </div>
             <div class="text-sm text-gray-500">Quiz</div>
             <div class="text-xs text-gray-400 mt-1">
               +{{ dashboardData.quizzes?.new_this_week || 0 }} cette semaine
             </div>
           </div>
           <div class="card text-center">
-            <div class="text-3xl font-bold text-green-600">{{ dashboardData.results?.total || 0 }}</div>
+            <div class="text-3xl font-bold text-green-600">
+              {{ dashboardData.results?.total || 0 }}
+            </div>
             <div class="text-sm text-gray-500">Parties jouees</div>
             <div class="text-xs text-gray-400 mt-1">
               Moy: {{ dashboardData.results?.avg_score || 0 }} pts
@@ -296,23 +299,33 @@ onMounted(async () => {
           <h3 class="font-semibold mb-4">Repartition des utilisateurs</h3>
           <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
             <div class="text-center p-3 bg-blue-50 rounded-lg">
-              <div class="text-xl font-bold text-blue-600">{{ dashboardData.users?.profs || 0 }}</div>
+              <div class="text-xl font-bold text-blue-600">
+                {{ dashboardData.users?.profs || 0 }}
+              </div>
               <div class="text-sm text-gray-600">Professeurs</div>
             </div>
             <div class="text-center p-3 bg-green-50 rounded-lg">
-              <div class="text-xl font-bold text-green-600">{{ dashboardData.users?.eleves || 0 }}</div>
+              <div class="text-xl font-bold text-green-600">
+                {{ dashboardData.users?.eleves || 0 }}
+              </div>
               <div class="text-sm text-gray-600">Eleves</div>
             </div>
             <div class="text-center p-3 bg-red-50 rounded-lg">
-              <div class="text-xl font-bold text-red-600">{{ dashboardData.users?.admins || 0 }}</div>
+              <div class="text-xl font-bold text-red-600">
+                {{ dashboardData.users?.admins || 0 }}
+              </div>
               <div class="text-sm text-gray-600">Admins</div>
             </div>
             <div class="text-center p-3 bg-yellow-50 rounded-lg">
-              <div class="text-xl font-bold text-yellow-600">{{ dashboardData.users?.premium || 0 }}</div>
+              <div class="text-xl font-bold text-yellow-600">
+                {{ dashboardData.users?.premium || 0 }}
+              </div>
               <div class="text-sm text-gray-600">Premium</div>
             </div>
             <div class="text-center p-3 bg-gray-100 rounded-lg">
-              <div class="text-xl font-bold text-gray-600">{{ dashboardData.users?.inactive || 0 }}</div>
+              <div class="text-xl font-bold text-gray-600">
+                {{ dashboardData.users?.inactive || 0 }}
+              </div>
               <div class="text-sm text-gray-600">Inactifs</div>
             </div>
           </div>
@@ -385,12 +398,24 @@ onMounted(async () => {
           <table v-else class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
               <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Role</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Premium</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actif</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Inscription</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Stats</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  Email
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  Role
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  Premium
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  Actif
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  Inscription
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  Stats
+                </th>
                 <th class="px-6 py-3"></th>
               </tr>
             </thead>
@@ -415,7 +440,9 @@ onMounted(async () => {
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   <span v-if="user.quiz_count !== undefined">{{ user.quiz_count }} quiz</span>
-                  <span v-else-if="user.result_count !== undefined">{{ user.result_count }} parties</span>
+                  <span v-else-if="user.result_count !== undefined">
+                    {{ user.result_count }} parties
+                  </span>
                   <span v-else>-</span>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-right">
@@ -432,14 +459,15 @@ onMounted(async () => {
             v-if="usersPagination.totalPages > 1"
             class="px-6 py-4 border-t flex items-center justify-between"
           >
-            <span class="text-sm text-gray-500">
-              {{ usersPagination.total }} utilisateurs
-            </span>
+            <span class="text-sm text-gray-500">{{ usersPagination.total }} utilisateurs</span>
             <div class="flex space-x-2">
               <button
                 class="btn btn-secondary text-sm"
                 :disabled="usersPagination.page <= 1"
-                @click="usersPagination.page--; loadUsers()"
+                @click="
+                  usersPagination.page--
+                  loadUsers()
+                "
               >
                 Precedent
               </button>
@@ -449,7 +477,10 @@ onMounted(async () => {
               <button
                 class="btn btn-secondary text-sm"
                 :disabled="usersPagination.page >= usersPagination.totalPages"
-                @click="usersPagination.page++; loadUsers()"
+                @click="
+                  usersPagination.page++
+                  loadUsers()
+                "
               >
                 Suivant
               </button>
@@ -479,19 +510,11 @@ onMounted(async () => {
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">Date debut</label>
-              <input
-                v-model="logsFilters.start_date"
-                type="date"
-                class="input"
-              />
+              <input v-model="logsFilters.start_date" type="date" class="input" />
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">Date fin</label>
-              <input
-                v-model="logsFilters.end_date"
-                type="date"
-                class="input"
-              />
+              <input v-model="logsFilters.end_date" type="date" class="input" />
             </div>
             <button class="btn btn-primary" @click="loadLogs">Filtrer</button>
           </div>
@@ -507,12 +530,24 @@ onMounted(async () => {
             <table class="min-w-full divide-y divide-gray-200">
               <thead class="bg-gray-50">
                 <tr>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Action</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Utilisateur</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cible</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">IP</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Details</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    Date
+                  </th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    Action
+                  </th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    Utilisateur
+                  </th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    Cible
+                  </th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    IP
+                  </th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    Details
+                  </th>
                 </tr>
               </thead>
               <tbody class="bg-white divide-y divide-gray-200">
@@ -521,7 +556,10 @@ onMounted(async () => {
                     {{ formatDate(log.created_at) }}
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap">
-                    <span :class="getActionBadge(log.action)" class="px-2 py-1 text-xs rounded-full">
+                    <span
+                      :class="getActionBadge(log.action)"
+                      class="px-2 py-1 text-xs rounded-full"
+                    >
                       {{ log.action }}
                     </span>
                   </td>
@@ -548,14 +586,15 @@ onMounted(async () => {
             v-if="logsPagination.totalPages > 1"
             class="px-6 py-4 border-t flex items-center justify-between"
           >
-            <span class="text-sm text-gray-500">
-              {{ logsPagination.total }} logs
-            </span>
+            <span class="text-sm text-gray-500">{{ logsPagination.total }} logs</span>
             <div class="flex space-x-2">
               <button
                 class="btn btn-secondary text-sm"
                 :disabled="logsPagination.page <= 1"
-                @click="logsPagination.page--; loadLogs()"
+                @click="
+                  logsPagination.page--
+                  loadLogs()
+                "
               >
                 Precedent
               </button>
@@ -565,7 +604,10 @@ onMounted(async () => {
               <button
                 class="btn btn-secondary text-sm"
                 :disabled="logsPagination.page >= logsPagination.totalPages"
-                @click="logsPagination.page++; loadLogs()"
+                @click="
+                  logsPagination.page++
+                  loadLogs()
+                "
               >
                 Suivant
               </button>
@@ -584,7 +626,9 @@ onMounted(async () => {
       <div class="bg-white rounded-xl p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
         <div class="flex justify-between items-center mb-6">
           <h3 class="text-lg font-semibold">Details utilisateur</h3>
-          <button class="text-gray-500 hover:text-gray-700" @click="showUserModal = false">X</button>
+          <button class="text-gray-500 hover:text-gray-700" @click="showUserModal = false">
+            X
+          </button>
         </div>
 
         <div v-if="userDetails">
@@ -662,7 +706,9 @@ onMounted(async () => {
 
           <!-- Results (for eleves) -->
           <div v-if="userDetails.results?.length > 0" class="mb-6">
-            <h4 class="font-medium text-gray-700 mb-2">Resultats ({{ userDetails.results.length }})</h4>
+            <h4 class="font-medium text-gray-700 mb-2">
+              Resultats ({{ userDetails.results.length }})
+            </h4>
             <div class="space-y-2">
               <div
                 v-for="result in userDetails.results"
@@ -719,18 +765,15 @@ onMounted(async () => {
       <div class="bg-white rounded-xl p-6 max-w-md w-full mx-4">
         <div class="flex justify-between items-center mb-6">
           <h3 class="text-lg font-semibold">Creer un utilisateur</h3>
-          <button class="text-gray-500 hover:text-gray-700" @click="showCreateModal = false">X</button>
+          <button class="text-gray-500 hover:text-gray-700" @click="showCreateModal = false">
+            X
+          </button>
         </div>
 
         <form @submit.prevent="createUser">
           <div class="mb-4">
             <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-            <input
-              v-model="newUser.email"
-              type="email"
-              class="input w-full"
-              required
-            />
+            <input v-model="newUser.email" type="email" class="input w-full" required />
           </div>
 
           <div class="mb-4">

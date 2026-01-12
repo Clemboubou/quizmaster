@@ -4,7 +4,7 @@
  * Ce composant affiche une question avec ses options
  * et permet a l'utilisateur de selectionner une reponse.
  */
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 import QuestionDisplay from '../../components/QuestionDisplay.vue'
 

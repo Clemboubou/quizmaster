@@ -82,7 +82,8 @@ async function login(req, res) {
         })
 
         // Retourner l'utilisateur sans le mot de passe
-        const { password: _, ...userWithoutPassword } = user
+        // eslint-disable-next-line no-unused-vars
+        const { password: _pwd, ...userWithoutPassword } = user
 
         return successResponse(res, {
             user: userWithoutPassword,

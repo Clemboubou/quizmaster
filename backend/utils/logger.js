@@ -71,7 +71,14 @@ const LOG_ACTIONS = {
  * @param {Object} options.req - Objet request Express (pour IP et user-agent)
  */
 async function log(options) {
-    const { userId = null, action, targetType = null, targetId = null, details = null, req = null } = options
+    const {
+        userId = null,
+        action,
+        targetType = null,
+        targetId = null,
+        details = null,
+        req = null
+    } = options
 
     // Extraire IP et User-Agent de la requete
     let ipAddress = null
@@ -79,7 +86,8 @@ async function log(options) {
 
     if (req) {
         // Gerer les proxies (X-Forwarded-For)
-        ipAddress = req.headers['x-forwarded-for']?.split(',')[0] || req.ip || req.connection?.remoteAddress
+        ipAddress =
+            req.headers['x-forwarded-for']?.split(',')[0] || req.ip || req.connection?.remoteAddress
         userAgent = req.headers['user-agent'] || null
     }
 
@@ -87,7 +95,15 @@ async function log(options) {
         await pool.query(
             `INSERT INTO logs (user_id, action, target_type, target_id, details, ip_address, user_agent)
              VALUES (?, ?, ?, ?, ?, ?, ?)`,
-            [userId, action, targetType, targetId, details ? JSON.stringify(details) : null, ipAddress, userAgent]
+            [
+                userId,
+                action,
+                targetType,
+                targetId,
+                details ? JSON.stringify(details) : null,
+                ipAddress,
+                userAgent
+            ]
         )
     } catch (error) {
         // Ne pas faire planter l'application si le logging echoue
@@ -108,8 +124,15 @@ async function log(options) {
  * @param {string|null} options.endDate - Date de fin (YYYY-MM-DD)
  */
 async function getLogs(options = {}) {
-    const { page = 1, limit = 50, action = null, userId = null, targetType = null, startDate = null, endDate = null } =
-        options
+    const {
+        page = 1,
+        limit = 50,
+        action = null,
+        userId = null,
+        targetType = null,
+        startDate = null,
+        endDate = null
+    } = options
 
     const offset = (page - 1) * limit
     const conditions = []
@@ -154,7 +177,10 @@ async function getLogs(options = {}) {
     )
 
     // Compter le total pour la pagination
-    const [countResult] = await pool.query(`SELECT COUNT(*) as total FROM logs l ${whereClause}`, params)
+    const [countResult] = await pool.query(
+        `SELECT COUNT(*) as total FROM logs l ${whereClause}`,
+        params
+    )
 
     return {
         logs,

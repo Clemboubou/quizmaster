@@ -4,7 +4,7 @@
  * Ce composant affiche le score final apres un quiz.
  * Il calcule le pourcentage et affiche un message adapte.
  */
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 import ScoreDisplay from '../../components/ScoreDisplay.vue'
 
