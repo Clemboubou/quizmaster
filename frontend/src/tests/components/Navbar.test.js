@@ -8,14 +8,14 @@
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createMemoryHistory } from 'vue-router'
 import { setActivePinia, createPinia } from 'pinia'
 import Navbar from '../../components/Navbar.vue'
 import { useAuthStore } from '../../stores/auth'
 
 // Configuration du router pour les tests
 const router = createRouter({
-  history: createWebHistory(),
+  history: createMemoryHistory(),
   routes: [
     { path: '/', component: { template: '<div>Home</div>' } },
     { path: '/auth', component: { template: '<div>Auth</div>' } },

@@ -8,7 +8,7 @@
  */
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createMemoryHistory } from 'vue-router'
 import QuizCard from '../../components/QuizCard.vue'
 
 // Mock du clipboard
@@ -22,7 +22,7 @@ global.alert = vi.fn()
 
 // Configuration du router pour les tests
 const router = createRouter({
-  history: createWebHistory(),
+  history: createMemoryHistory(),
   routes: [
     { path: '/', component: { template: '<div>Home</div>' } },
     { path: '/create-quiz', component: { template: '<div>Create</div>' } }
