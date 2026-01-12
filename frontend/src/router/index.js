@@ -8,6 +8,7 @@ import CreateQuizView from '../views/CreateQuizView.vue'
 import PlayQuizView from '../views/PlayQuizView.vue'
 import PaymentView from '../views/PaymentView.vue'
 import PaymentSuccessView from '../views/PaymentSuccessView.vue'
+import AdminDashboardView from '../views/AdminDashboardView.vue'
 
 const routes = [
   {
@@ -49,6 +50,12 @@ const routes = [
     name: 'payment-success',
     component: PaymentSuccessView,
     meta: { requiresAuth: true, role: 'prof' }
+  },
+  {
+    path: '/admin',
+    name: 'admin',
+    component: AdminDashboardView,
+    meta: { requiresAuth: true, role: 'admin' }
   }
 ]
 

@@ -15,6 +15,7 @@
 11. [SEO et Referencement](#11-seo-et-referencement)
 12. [Accessibilite (a11y)](#12-accessibilite-a11y)
 13. [Installation et lancement](#13-installation-et-lancement)
+14. [Administration](#14-administration)
 
 ---
 
@@ -28,10 +29,11 @@ QuizMaster est une application web permettant aux professeurs de creer des quiz 
 - **Un backend** : le serveur qui gere la logique metier et les donnees (invisible pour l'utilisateur)
 - **Une base de donnees** : le stockage permanent des informations (utilisateurs, quiz, resultats)
 
-### Les deux types d'utilisateurs
+### Les trois types d'utilisateurs
 
 1. **Professeur (prof)** : peut creer des quiz, ajouter des questions, voir les resultats des eleves
 2. **Eleve** : peut rejoindre un quiz via un code, repondre aux questions, voir son historique
+3. **Administrateur (admin)** : peut gerer tous les utilisateurs, voir les statistiques, consulter les logs systeme
 
 ### Le modele economique
 
@@ -2883,6 +2885,86 @@ npm run dev
 
 ---
 
+## 14. Administration
+
+### Fonctionnalites admin
+
+Le systeme d'administration permet de :
+
+- **Dashboard** : statistiques globales (utilisateurs, quiz, parties, revenus)
+- **Gestion des utilisateurs** : liste, recherche, modification, suppression
+- **Logs systeme** : suivi de toutes les actions avec date, heure, IP, utilisateur
+
+### Creation d'un compte admin
+
+```bash
+cd backend
+node scripts/create-admin.js admin@quizmaster.com MotDePasseSecure123!
+```
+
+Ou via la migration SQL :
+```sql
+-- Executer d'abord backend/database/migration_admin.sql
+-- Puis creer l'admin manuellement avec bcrypt
+```
+
+### Endpoints API Admin
+
+| Methode | Endpoint | Description |
+|---------|----------|-------------|
+| GET | /api/admin/dashboard | Statistiques du dashboard |
+| GET | /api/admin/users | Liste des utilisateurs (pagination, filtres) |
+| POST | /api/admin/users | Creer un utilisateur |
+| GET | /api/admin/users/:id | Details d'un utilisateur |
+| PUT | /api/admin/users/:id | Modifier un utilisateur |
+| DELETE | /api/admin/users/:id | Supprimer un utilisateur |
+| GET | /api/admin/logs | Liste des logs (pagination, filtres) |
+| GET | /api/admin/logs/stats | Statistiques des logs |
+
+### Structure du systeme de logs
+
+Chaque action importante est enregistree dans la table `logs` :
+
+```sql
+CREATE TABLE logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NULL,                    -- Utilisateur qui a fait l'action
+    action VARCHAR(100) NOT NULL,        -- Type d'action (LOGIN, QUIZ_CREATED, etc.)
+    target_type VARCHAR(50) NULL,        -- Type d'entite concernee (user, quiz, etc.)
+    target_id INT NULL,                  -- ID de l'entite concernee
+    details JSON NULL,                   -- Informations supplementaires
+    ip_address VARCHAR(45) NULL,         -- Adresse IP du client
+    user_agent TEXT NULL,                -- Navigateur/client utilise
+    created_at TIMESTAMP DEFAULT NOW()
+);
+```
+
+### Actions loguees
+
+| Action | Description |
+|--------|-------------|
+| LOGIN | Connexion reussie |
+| LOGIN_FAILED | Tentative de connexion echouee |
+| REGISTER | Inscription d'un nouvel utilisateur |
+| QUIZ_CREATED | Creation d'un quiz |
+| QUIZ_DELETED | Suppression d'un quiz |
+| USER_CREATED | Creation d'un utilisateur (par admin) |
+| USER_UPDATED | Modification d'un utilisateur |
+| USER_DELETED | Suppression d'un utilisateur |
+| USER_ROLE_CHANGED | Changement de role |
+| USER_PREMIUM_GRANTED | Attribution du statut premium |
+| USER_DEACTIVATED | Desactivation d'un compte |
+| PAYMENT_COMPLETED | Paiement reussi |
+
+### Securite admin
+
+- Middleware `requireAdmin` : verifie que l'utilisateur est authentifie et a le role `admin`
+- Un admin ne peut pas supprimer son propre compte
+- Un admin ne peut pas retirer son propre role admin
+- Toutes les actions admin sont loguees
+
+---
+
 ## Conclusion
 
 Ce projet QuizMaster couvre les competences suivantes :
@@ -2923,7 +3005,13 @@ Ce projet QuizMaster couvre les competences suivantes :
 - ✅ EditorConfig pour la coherence entre editeurs
 - ✅ GitHub Actions CI/CD (lint, format, tests, build)
 
+### Administration
+- ✅ Dashboard admin avec statistiques
+- ✅ Gestion complete des utilisateurs (CRUD)
+- ✅ Systeme de logs avec date/heure/IP
+- ✅ Role admin avec middleware de protection
+
 ### Points d'amelioration possibles
 - Rate limiting pour la securite
-- Monitoring et logging
 - Tests automatises d'accessibilite (axe-core)
+- Notifications email

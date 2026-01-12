@@ -4,7 +4,7 @@ const { errorResponse } = require('../utils/responses')
  * Middleware de verification du role professeur
  */
 function requireProf(req, res, next) {
-    if (req.user.role !== 'prof') {
+    if (req.user.role !== 'prof' && req.user.role !== 'admin') {
         return errorResponse(res, 'FORBIDDEN', 'Acces reserve aux professeurs', 403)
     }
     next()
@@ -20,7 +20,19 @@ function requireEleve(req, res, next) {
     next()
 }
 
+/**
+ * Middleware de verification du role administrateur
+ * Seuls les admins peuvent acceder aux routes protegees par ce middleware
+ */
+function requireAdmin(req, res, next) {
+    if (req.user.role !== 'admin') {
+        return errorResponse(res, 'FORBIDDEN', 'Acces reserve aux administrateurs', 403)
+    }
+    next()
+}
+
 module.exports = {
     requireProf,
-    requireEleve
+    requireEleve,
+    requireAdmin
 }

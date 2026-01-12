@@ -11,6 +11,7 @@ export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = computed(() => !!token.value)
   const isProf = computed(() => user.value?.role === 'prof')
   const isEleve = computed(() => user.value?.role === 'eleve')
+  const isAdmin = computed(() => user.value?.role === 'admin')
   const isPremium = computed(() => user.value?.is_premium === 1 || user.value?.is_premium === true)
 
   // Actions
@@ -57,6 +58,7 @@ export const useAuthStore = defineStore('auth', () => {
     isAuthenticated,
     isProf,
     isEleve,
+    isAdmin,
     isPremium,
     register,
     login,

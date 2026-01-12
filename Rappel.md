@@ -7,9 +7,10 @@
 3. [Frontend Vue.js](#frontend-vuejs)
 4. [Securite](#securite)
 5. [Base de Donnees](#base-de-donnees)
-6. [SEO et Accessibilite](#seo-et-accessibilite)
-7. [Industrialisation](#industrialisation)
-8. [Fichiers Cles](#fichiers-cles)
+6. [Administration](#administration)
+7. [SEO et Accessibilite](#seo-et-accessibilite)
+8. [Industrialisation](#industrialisation)
+9. [Fichiers Cles](#fichiers-cles)
 
 ---
 
@@ -64,14 +65,20 @@ backend/
 ├── routes/
 │   ├── auth.routes.js  # /api/auth/*
 │   ├── quiz.routes.js  # /api/quizzes/*
+│   ├── admin.routes.js # /api/admin/*
 │   └── ...
-├── controllers/        # Logique metier
+├── controllers/
+│   ├── admin.controller.js  # Dashboard, users, logs
+│   └── ...
 ├── middlewares/
 │   ├── auth.middleware.js    # Verifie JWT
-│   └── role.middleware.js    # Verifie role
+│   └── role.middleware.js    # requireProf, requireAdmin
 ├── validators/         # Validation des donnees
-└── utils/
-    └── responses.js    # Format reponses standard
+├── utils/
+│   ├── responses.js    # Format reponses standard
+│   └── logger.js       # Service de logging
+└── scripts/
+    └── create-admin.js # Creation compte admin
 ```
 
 ## Chaine de middlewares
@@ -129,13 +136,16 @@ frontend/src/
 ├── main.js             # Point d'entree
 ├── App.vue             # Composant racine
 ├── router/
-│   └── index.js        # Routes + guards
+│   └── index.js        # Routes + guards (dont /admin)
 ├── stores/
-│   ├── auth.js         # State authentification
+│   ├── auth.js         # State auth (isAdmin getter)
 │   └── quiz.js         # State quiz/questions
 ├── services/
-│   └── api.js          # Config Axios + intercepteurs
-├── views/              # Pages (routes)
+│   ├── api.js          # Config Axios + intercepteurs
+│   └── admin.js        # Appels API admin
+├── views/
+│   ├── AdminDashboardView.vue  # Dashboard admin
+│   └── ...             # Autres pages
 ├── components/         # Composants reutilisables
 ├── composables/        # Logique reutilisable
 │   └── useSeo.js       # SEO dynamique
@@ -323,7 +333,8 @@ app.use(cors({
 ## Schema relationnel
 
 ```
-users (id, email, password, role, is_premium, created_at)
+users (id, email, password, role, is_premium, is_active, created_at)
+  │         └─ role: 'prof' | 'eleve' | 'admin'
   │
   ├──< quizzes (id, user_id, title, access_code, created_at)
   │       │
@@ -333,7 +344,9 @@ users (id, email, password, role, is_premium, created_at)
   │               │
   │               └──< answers (id, result_id, question_id, user_answer, is_correct)
   │
-  └──< payments (id, user_id, stripe_session_id, amount, status, created_at)
+  ├──< payments (id, user_id, stripe_session_id, amount, status, created_at)
+  │
+  └──< logs (id, user_id, action, target_type, target_id, details, ip_address, user_agent, created_at)
 ```
 
 ## Relations
@@ -345,6 +358,7 @@ users (id, email, password, role, is_premium, created_at)
 | quizzes → results | 1:N | Un quiz peut etre joue plusieurs fois |
 | users → results | 1:N | Un eleve a plusieurs resultats |
 | results → answers | 1:N | Un resultat a plusieurs reponses |
+| users → logs | 1:N | Un utilisateur a plusieurs logs d'activite |
 
 ## CASCADE
 
@@ -354,6 +368,124 @@ ON DELETE CASCADE
 -- → Ses questions sont supprimees
 -- → Ses resultats sont supprimes
 -- → Les reponses de ces resultats sont supprimees
+```
+
+---
+
+# Administration
+
+## Roles utilisateurs
+
+| Role | Droits |
+|------|--------|
+| **eleve** | Jouer aux quiz, voir ses resultats |
+| **prof** | Creer/modifier/supprimer ses quiz, voir resultats |
+| **admin** | Gerer tous les utilisateurs, voir les logs |
+
+## Architecture Admin
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    SYSTEME ADMIN                                │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│   FRONTEND                  BACKEND                  DATABASE   │
+│                                                                  │
+│   AdminDashboard.vue        admin.routes.js          users      │
+│   ├─ Onglet Dashboard       ├─ GET /dashboard        (role)     │
+│   ├─ Onglet Users           ├─ CRUD /users                      │
+│   └─ Onglet Logs            └─ GET /logs             logs       │
+│                                                       (table)   │
+│                                                                  │
+│   admin.js (service)        admin.controller.js                 │
+│                             logger.js                           │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+## Middleware requireAdmin
+
+```javascript
+// middlewares/role.middleware.js
+function requireAdmin(req, res, next) {
+    if (req.user.role !== 'admin') {
+        return errorResponse(res, 'FORBIDDEN', 'Acces reserve aux administrateurs', 403)
+    }
+    next()
+}
+
+// Application sur toutes les routes admin
+router.use(authenticateToken)
+router.use(requireAdmin)
+```
+
+## Systeme de Logs
+
+```javascript
+// Structure d'un log
+{
+    user_id: 1,              // Qui
+    action: 'USER_DELETED',  // Quoi
+    target_type: 'user',     // Sur quoi
+    target_id: 5,            // ID cible
+    details: { email: '...' }, // Details JSON
+    ip_address: '192.168.1.1', // Adresse IP
+    user_agent: 'Mozilla/...', // Navigateur
+    created_at: '2024-01-15 10:30:00' // Quand
+}
+```
+
+## Actions loguees
+
+| Action | Description |
+|--------|-------------|
+| `LOGIN` | Connexion reussie |
+| `LOGIN_FAILED` | Tentative echouee |
+| `REGISTER` | Nouvelle inscription |
+| `QUIZ_CREATED` | Creation quiz |
+| `QUIZ_DELETED` | Suppression quiz |
+| `USER_CREATED` | Creation utilisateur (admin) |
+| `USER_UPDATED` | Modification utilisateur |
+| `USER_DELETED` | Suppression utilisateur |
+| `USER_ROLE_CHANGED` | Changement de role |
+| `PAYMENT_COMPLETED` | Paiement reussi |
+
+## Endpoints API Admin
+
+| Methode | Endpoint | Description |
+|---------|----------|-------------|
+| GET | /api/admin/dashboard | Statistiques |
+| GET | /api/admin/users | Liste utilisateurs |
+| POST | /api/admin/users | Creer utilisateur |
+| GET | /api/admin/users/:id | Details utilisateur |
+| PUT | /api/admin/users/:id | Modifier utilisateur |
+| DELETE | /api/admin/users/:id | Supprimer utilisateur |
+| GET | /api/admin/logs | Liste logs |
+| GET | /api/admin/logs/stats | Stats logs |
+
+## Securites Admin
+
+```javascript
+// Un admin ne peut pas se supprimer lui-meme
+if (parseInt(id) === req.user.userId) {
+    return errorResponse(res, 'FORBIDDEN', 'Impossible de supprimer son propre compte', 403)
+}
+
+// Un admin ne peut pas retirer son propre role admin
+if (parseInt(id) === req.user.userId && role !== 'admin') {
+    return errorResponse(res, 'FORBIDDEN', 'Impossible de retirer ses droits admin', 403)
+}
+```
+
+## Creation compte Admin
+
+```bash
+# Via script
+cd backend
+node scripts/create-admin.js admin@quizmaster.com MotDePasse123!
+
+# Via migration SQL (puis creer l'admin)
+mysql -u root < database/migration_admin.sql
 ```
 
 ---
@@ -489,9 +621,13 @@ jobs:
 | `server.js` | Point d'entree, config Express |
 | `config/database.js` | Pool MySQL |
 | `middlewares/auth.middleware.js` | Verification JWT |
+| `middlewares/role.middleware.js` | requireProf, requireAdmin |
 | `controllers/auth.controller.js` | Login, register, getMe |
 | `controllers/quiz.controller.js` | CRUD quiz |
+| `controllers/admin.controller.js` | Dashboard, users, logs |
+| `utils/logger.js` | Service de logging |
 | `routes/*.js` | Definition des endpoints |
+| `scripts/create-admin.js` | Creation compte admin |
 
 ## Frontend
 
@@ -499,10 +635,12 @@ jobs:
 |---------|------|
 | `main.js` | Point d'entree, init Pinia/Router |
 | `App.vue` | Layout principal, skip link |
-| `router/index.js` | Routes + guards |
-| `stores/auth.js` | State auth, login/logout |
+| `router/index.js` | Routes + guards (dont /admin) |
+| `stores/auth.js` | State auth, isAdmin getter |
 | `stores/quiz.js` | State quiz, questions, results |
 | `services/api.js` | Config Axios, intercepteurs |
+| `services/admin.js` | Appels API admin |
+| `views/AdminDashboardView.vue` | Dashboard admin complet |
 | `composables/useSeo.js` | SEO dynamique |
 
 ## Config
@@ -548,8 +686,9 @@ npm run format   # Prettier
 | Tests backend | 50 |
 | Tests frontend | 149 |
 | Tests total | **178** |
-| Tables MySQL | 6 |
-| Endpoints API | ~20 |
+| Tables MySQL | 7 (avec logs) |
+| Endpoints API | ~28 (avec admin) |
 | Composants Vue | 5 |
-| Vues (pages) | 7 |
-| Lignes documentation | ~2900 |
+| Vues (pages) | 8 (avec admin) |
+| Roles utilisateurs | 3 (eleve, prof, admin) |
+| Lignes documentation | ~3200 |

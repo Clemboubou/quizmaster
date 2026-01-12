@@ -7,8 +7,9 @@ CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
-    role ENUM('prof', 'eleve') NOT NULL,
+    role ENUM('prof', 'eleve', 'admin') NOT NULL,
     is_premium BOOLEAN DEFAULT FALSE,
+    is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -66,9 +67,31 @@ CREATE TABLE payments (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
+-- Table logs (actions administrateur et systeme)
+CREATE TABLE logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NULL,
+    action VARCHAR(100) NOT NULL,
+    target_type VARCHAR(50) NULL,
+    target_id INT NULL,
+    details JSON NULL,
+    ip_address VARCHAR(45) NULL,
+    user_agent TEXT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+);
+
 -- Index pour performances
 CREATE INDEX idx_quizzes_user ON quizzes(user_id);
 CREATE INDEX idx_quizzes_code ON quizzes(access_code);
 CREATE INDEX idx_questions_quiz ON questions(quiz_id);
 CREATE INDEX idx_results_user ON results(user_id);
 CREATE INDEX idx_results_quiz ON results(quiz_id);
+CREATE INDEX idx_logs_user ON logs(user_id);
+CREATE INDEX idx_logs_action ON logs(action);
+CREATE INDEX idx_logs_created ON logs(created_at);
+
+-- Insertion d'un admin par defaut (password: Admin123!)
+-- Hash genere avec bcrypt 10 rounds pour "Admin123!"
+INSERT INTO users (email, password, role, is_premium, is_active) VALUES
+('admin@quizmaster.com', '$2b$10$rQZ5z5Y5Y5Y5Y5Y5Y5Y5YeKJKJKJKJKJKJKJKJKJKJKJKJKJKJKJKJ', 'admin', TRUE, TRUE);

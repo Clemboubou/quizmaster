@@ -6,6 +6,7 @@
 2. [Questions Frontend (Bloc 2)](#questions-frontend-bloc-2)
 3. [Questions Transversales](#questions-transversales)
 4. [Questions Pieges Classiques](#questions-pieges-classiques)
+5. [Questions Administration](#questions-administration)
 
 ---
 
@@ -558,6 +559,135 @@ localStorage.removeItem('token')
 - Synchrone (bloque le thread)
 - Pas securise (accessible via JS, XSS)
 - Pas de date d'expiration
+
+---
+
+---
+
+# Questions Administration
+
+## Fonctionnalites Admin
+
+### Q: Pourquoi avoir ajoute un systeme d'administration ?
+
+**Reponse:**
+- **Gestion utilisateurs** : Un admin doit pouvoir gerer les comptes (bloquer, modifier roles, supprimer)
+- **Monitoring** : Suivre l'activite de la plateforme (logs, statistiques)
+- **Securite** : Pouvoir reagir rapidement en cas de probleme (compte compromis)
+- **Support** : Aider les utilisateurs (debloquer comptes, offrir premium)
+
+### Q: Expliquez le systeme de logs. Pourquoi logger les actions ?
+
+**Reponse:**
+```javascript
+// Chaque action importante est enregistree
+await log({
+    userId: req.user.userId,           // Qui a fait l'action
+    action: LOG_ACTIONS.USER_DELETED,  // Type d'action
+    targetType: 'user',                // Type d'entite concernee
+    targetId: 123,                     // ID de l'entite
+    details: { email: 'user@test.com' }, // Infos supplementaires
+    req                                // Pour IP et User-Agent
+})
+```
+
+**Raisons de logger :**
+- **Securite** : Detecter les activites suspectes
+- **Audit** : Tracer qui a fait quoi et quand (RGPD)
+- **Debug** : Comprendre les bugs en production
+- **Statistiques** : Analyser l'usage de la plateforme
+
+### Q: Comment securisez-vous les routes admin ?
+
+**Reponse:**
+```javascript
+// Middleware requireAdmin
+function requireAdmin(req, res, next) {
+    if (req.user.role !== 'admin') {
+        return errorResponse(res, 'FORBIDDEN', 'Acces reserve aux administrateurs', 403)
+    }
+    next()
+}
+
+// Utilisation dans les routes
+router.use(authenticateToken)  // 1. Verifie le JWT
+router.use(requireAdmin)       // 2. Verifie le role admin
+```
+
+**Protection en couches :**
+1. `authenticateToken` : Token JWT valide requis (401 sinon)
+2. `requireAdmin` : Role admin requis (403 sinon)
+3. Validations supplementaires : Un admin ne peut pas se supprimer lui-meme
+
+### Q: Quelles informations le dashboard admin affiche-t-il ?
+
+**Reponse:**
+```javascript
+// Statistiques recuperees
+{
+    users: { total, profs, eleves, admins, premium, inactive, new_this_week },
+    quizzes: { total, new_this_week },
+    results: { total, avg_score, played_this_week },
+    payments: { total, total_revenue, revenue_this_month },
+    recentLogs: [...],  // 10 dernieres actions
+    logStats: { last24h, last7days, topUsers }
+}
+```
+
+### Q: Comment gerez-vous la pagination et les filtres sur les logs ?
+
+**Reponse:**
+```javascript
+// Parametres de requete
+GET /api/admin/logs?page=1&limit=50&action=LOGIN&user_id=5&start_date=2024-01-01
+
+// Construction de la requete SQL
+const conditions = []
+if (action) conditions.push('l.action = ?')
+if (userId) conditions.push('l.user_id = ?')
+if (startDate) conditions.push('l.created_at >= ?')
+
+const whereClause = conditions.length > 0 ? 'WHERE ' + conditions.join(' AND ') : ''
+
+// Pagination avec LIMIT et OFFSET
+LIMIT ${limit} OFFSET ${(page - 1) * limit}
+```
+
+**Avantages :**
+- Performance : On ne charge pas tous les logs d'un coup
+- Flexibilite : Filtrage multicriteres
+- UX : Navigation page par page
+
+### Q: Pourquoi un admin ne peut-il pas supprimer son propre compte ?
+
+**Reponse:**
+```javascript
+if (parseInt(id) === req.user.userId) {
+    return errorResponse(res, 'FORBIDDEN', 'Vous ne pouvez pas supprimer votre propre compte', 403)
+}
+```
+
+**Raisons :**
+- **Securite** : Evite qu'un admin compromis ne supprime son propre compte pour brouiller les pistes
+- **Continuite** : Au moins un admin doit rester dans le systeme
+- **Audit** : Les logs garderont trace de l'admin qui a fait les actions
+
+### Q: Comment creez-vous un compte admin ?
+
+**Reponse:**
+```bash
+# Via script
+node scripts/create-admin.js admin@quizmaster.com MotDePasseSecure123!
+
+# Via API (admin existant requis)
+POST /api/admin/users
+{ "email": "admin2@test.com", "password": "MotDePasse123!", "role": "admin" }
+```
+
+**Le script `create-admin.js` :**
+1. Verifie que l'email n'existe pas
+2. Hash le mot de passe avec bcrypt
+3. Insere l'admin avec `role='admin'` et `is_premium=true`
 
 ---
 

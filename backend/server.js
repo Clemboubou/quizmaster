@@ -14,6 +14,7 @@ const quizRoutes = require('./routes/quiz.routes')
 const questionRoutes = require('./routes/question.routes')
 const resultRoutes = require('./routes/result.routes')
 const paymentRoutes = require('./routes/payment.routes')
+const adminRoutes = require('./routes/admin.routes')
 
 const app = express()
 const PORT = process.env.PORT || 3000
@@ -58,6 +59,7 @@ app.use('/api/quizzes', quizRoutes)
 app.use('/api/questions', questionRoutes)
 app.use('/api/results', resultRoutes)
 app.use('/api/payments', paymentRoutes)
+app.use('/api/admin', adminRoutes)
 
 // Route de sante
 app.get('/api/health', (req, res) => {

@@ -25,12 +25,27 @@ function handleLogout() {
               Tableau de bord
             </router-link>
 
+            <router-link
+              v-if="authStore.isAdmin"
+              to="/admin"
+              class="text-red-600 hover:text-red-700 font-medium"
+            >
+              Admin
+            </router-link>
+
             <span class="text-sm text-gray-500">
               {{ authStore.user?.email }}
             </span>
 
             <span
-              v-if="authStore.isProf"
+              v-if="authStore.isAdmin"
+              class="bg-red-100 text-red-800 px-2 py-1 text-xs rounded-full"
+            >
+              Admin
+            </span>
+
+            <span
+              v-else-if="authStore.isProf"
               :class="
                 authStore.isPremium ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800'
               "
