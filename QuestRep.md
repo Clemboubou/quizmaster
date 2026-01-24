@@ -1355,8 +1355,737 @@ QuizMaster est une plateforme web permettant aux professeurs de créer des quiz 
 
 - **199 tests** (50 backend + 149 frontend)
 - **25+ endpoints** API
-- **7 tables** en BDD
-- **3 rôles** : prof, élève, admin
+- **5 tables** en BDD
+- **2 rôles** : prof, élève
 - **bcrypt 10 rounds**
 - **WCAG 2.1 AA**
 - **9,99€** Premium
+
+---
+
+# EXPLICATIONS DÉBUTANT (Version Simple)
+
+Cette section explique les concepts comme si tu n'y connaissais rien. Utilise ces explications si le jury te pose des questions et que tu veux répondre simplement.
+
+---
+
+## C'est quoi une API ?
+
+**Explication simple :**
+C'est comme un serveur au restaurant. Tu ne vas pas en cuisine toi-même, tu passes ta commande au serveur, et il te ramène ton plat.
+
+- Le **client** (toi) = le site web
+- Le **serveur** (la personne) = l'API
+- La **cuisine** = la base de données
+
+**Dans mon projet :** Quand tu cliques "Créer un quiz", le site envoie une demande à l'API, l'API va chercher/enregistrer dans la base de données, et renvoie la réponse au site.
+
+---
+
+## C'est quoi un token JWT ?
+
+**Explication simple :**
+C'est comme un bracelet de festival. Quand tu arrives, on vérifie ton billet et on te donne un bracelet. Après, tu montres juste ton bracelet pour entrer partout sans repasser par la billetterie.
+
+- Tu te connectes (billet) → tu reçois un token (bracelet)
+- À chaque page, tu montres ton token → le serveur te laisse passer
+- Le token expire → tu dois te reconnecter
+
+**Ce que je sais :** Le token contient des infos (ton id, ton rôle) et il est signé pour qu'on ne puisse pas le modifier.
+
+**Ce que je ne maîtrise pas encore :** Les détails cryptographiques de la signature.
+
+---
+
+## C'est quoi le hashage ?
+
+**Explication simple :**
+C'est comme un hachoir à viande. Tu mets de la viande, ça ressort en steak haché. Mais tu ne peux pas refaire le morceau de viande à partir du haché.
+
+- Mot de passe "Password123" → hash "a7f8b2c9e4d..."
+- On ne peut pas retrouver "Password123" à partir du hash
+- Pour vérifier, on re-hashe et on compare
+
+**Pourquoi c'est important :** Même si quelqu'un vole la base de données, il ne peut pas lire les mots de passe.
+
+---
+
+## C'est quoi une injection SQL ?
+
+**Explication simple :**
+C'est comme si au guichet de la banque tu demandais : "Je voudrais retirer 100€ de mon compte... ET donner accès à tous les comptes."
+
+Si le guichetier exécute bêtement ta demande sans vérifier, c'est dangereux.
+
+**Protection :** J'utilise des requêtes préparées. C'est comme si le guichetier avait un formulaire avec des cases à remplir. Tu ne peux mettre que ce qui est prévu.
+
+```
+❌ Dangereux : "SELECT * FROM users WHERE email = '" + email + "'"
+✅ Sécurisé : "SELECT * FROM users WHERE email = ?", [email]
+```
+
+---
+
+## C'est quoi un middleware ?
+
+**Explication simple :**
+C'est comme les vigiles à l'entrée d'une boîte de nuit.
+- Vigile 1 : Tu as ta carte d'identité ? (authentification)
+- Vigile 2 : Tu es sur la liste VIP ? (autorisation)
+- Si tu passes les deux → tu entres
+
+**Dans mon code :**
+```
+Requête → [Vérifie token] → [Vérifie rôle] → Code principal
+```
+
+Si tu échoues à une étape, tu es bloqué.
+
+---
+
+## C'est quoi un webhook ?
+
+**Explication simple :**
+C'est comme quand tu commandes un colis et que le livreur te prévient "J'arrive dans 5 minutes".
+
+Tu n'appelles pas le livreur toutes les 2 minutes pour demander "T'es où ?". C'est LUI qui te contacte quand il y a du nouveau.
+
+**Avec Stripe :**
+- Le client paie sur Stripe
+- Stripe m'appelle : "Hey, le paiement est passé !"
+- Je mets à jour ma base de données
+
+---
+
+## C'est quoi Pinia ?
+
+**Explication simple :**
+C'est comme un tableau blanc partagé dans un bureau. Tout le monde peut le voir et le modifier.
+
+Sans Pinia : chaque page a ses propres infos, elles ne se parlent pas.
+Avec Pinia : les infos sont sur le tableau, toutes les pages y accèdent.
+
+**Exemple :** Quand tu te connectes, je stocke ton profil dans Pinia. Toutes les pages peuvent savoir qui tu es sans redemander au serveur.
+
+---
+
+## C'est quoi une clé étrangère ?
+
+**Explication simple :**
+C'est comme une adresse dans un carnet. Au lieu de recopier toutes les infos de quelqu'un, tu notes juste son adresse pour le retrouver.
+
+**Dans ma BDD :**
+- Table `quizzes` a une colonne `user_id`
+- Ce `user_id` pointe vers la table `users`
+- Je n'ai pas besoin de recopier le nom, email, etc. dans `quizzes`
+
+---
+
+## C'est quoi CASCADE DELETE ?
+
+**Explication simple :**
+C'est comme supprimer un dossier sur ton ordinateur. Si tu supprimes le dossier "Photos vacances", toutes les photos dedans sont supprimées aussi.
+
+**Dans ma BDD :** Si je supprime un utilisateur, tous ses quiz, questions et résultats sont supprimés automatiquement.
+
+---
+
+## C'est quoi le responsive design ?
+
+**Explication simple :**
+C'est comme un t-shirt qui s'adapte à toutes les tailles. Le site s'affiche bien sur téléphone, tablette et ordinateur.
+
+**Comment je fais :** J'utilise Tailwind CSS qui a des classes pour chaque taille d'écran.
+
+---
+
+## C'est quoi un test automatisé ?
+
+**Explication simple :**
+C'est comme un correcteur automatique. Au lieu de vérifier à la main que tout marche, j'écris des vérifications que l'ordinateur fait pour moi.
+
+**Exemple :**
+```
+Test : "Si j'envoie un email invalide, ça doit échouer"
+→ J'envoie "pas-un-email"
+→ Je vérifie que l'erreur est "Email invalide"
+```
+
+**Pourquoi c'est utile :** Si je modifie mon code et que je casse quelque chose, les tests me préviennent.
+
+---
+
+## C'est quoi CI/CD ?
+
+**Explication simple :**
+C'est comme un contrôle qualité automatique à l'usine. À chaque fois que je pousse mon code sur GitHub :
+1. Ça vérifie que le code est bien écrit
+2. Ça lance tous les tests
+3. Si tout est vert → c'est bon
+4. Si c'est rouge → il y a un problème
+
+**Avantage :** Je ne peux pas oublier de lancer les tests.
+
+---
+
+# RÉPONSES HONNÊTES QUAND TU NE SAIS PAS
+
+## Formules à utiliser
+
+| Situation | Ce que tu dis |
+|-----------|---------------|
+| Tu ne sais pas du tout | "Je ne connais pas ce sujet en détail, c'est quelque chose que je dois encore apprendre." |
+| Tu sais un peu | "Je comprends le principe de base : [explication simple]. Mais je ne maîtrise pas les détails techniques." |
+| Tu as fait sans comprendre | "J'ai suivi la documentation et ça fonctionne, mais je ne saurais pas l'expliquer en profondeur." |
+| C'est hors de ton projet | "Je n'ai pas eu besoin de ça dans mon projet, mais je sais que ça existe." |
+
+---
+
+## Questions difficiles et réponses honnêtes
+
+### "Pourquoi localStorage et pas les cookies HttpOnly ?"
+
+**Réponse honnête :**
+> "J'ai utilisé localStorage parce que c'est ce que j'ai appris et c'est plus simple à mettre en place. Je sais que les cookies HttpOnly seraient plus sécurisés parce qu'ils ne sont pas accessibles par JavaScript, donc protégés contre les attaques XSS. Mais je ne maîtrise pas encore cette implémentation."
+
+---
+
+### "Comment tu scalerais ton application ?"
+
+**Réponse honnête :**
+> "Je n'ai pas encore étudié cette partie. Je sais que ça existe, qu'on peut utiliser plusieurs serveurs avec un load balancer, mais je ne saurais pas le mettre en place aujourd'hui. C'est quelque chose que je veux apprendre."
+
+---
+
+### "Pourquoi pas TypeScript ?"
+
+**Réponse honnête :**
+> "Je ne maîtrise pas encore TypeScript. J'ai préféré me concentrer sur JavaScript pour bien comprendre les bases. TypeScript est sur ma liste d'apprentissage pour la suite."
+
+---
+
+### "Comment fonctionne exactement la signature JWT ?"
+
+**Réponse honnête :**
+> "Je sais que le token est signé avec une clé secrète côté serveur, et que ça permet de vérifier qu'il n'a pas été modifié. Mais les détails cryptographiques, je ne les maîtrise pas."
+
+---
+
+### "Que se passe-t-il si le webhook Stripe échoue ?"
+
+**Réponse honnête :**
+> "Honnêtement, je ne sais pas exactement. J'ai lu dans la documentation que Stripe réessaie automatiquement, mais je n'ai pas approfondi ce cas. C'est quelque chose que je devrais mieux comprendre pour une application en production."
+
+---
+
+### "Pourquoi tu n'as pas utilisé Docker ?"
+
+**Réponse honnête :**
+> "Je n'ai pas encore appris Docker. Pour ce projet solo en développement local, XAMPP était suffisant. Je sais que Docker serait utile pour avoir le même environnement partout et pour le déploiement, mais je ne le maîtrise pas encore."
+
+---
+
+### "C'est quoi le rate limiting ? Pourquoi tu ne l'as pas fait ?"
+
+**Réponse honnête :**
+> "Le rate limiting, c'est limiter le nombre de requêtes qu'un utilisateur peut faire. Ça protège contre les attaques par force brute. Je ne l'ai pas implémenté parce que je ne savais pas comment faire, mais je sais que c'est important pour la sécurité en production."
+
+---
+
+### "Comment tu gères les refresh tokens ?"
+
+**Réponse honnête :**
+> "Je n'ai pas implémenté de refresh token. J'utilise un seul token JWT qui expire. Je sais que le système access token + refresh token est plus sécurisé, mais je n'ai pas encore appris à le mettre en place."
+
+---
+
+### "C'est quoi la différence entre SSR et CSR ?"
+
+**Réponse honnête :**
+> "CSR c'est ce que je fais : le JavaScript s'exécute dans le navigateur pour afficher la page. SSR c'est quand le serveur génère le HTML directement. SSR est meilleur pour le SEO. Je sais que Nuxt.js permet de faire du SSR avec Vue, mais je ne l'ai pas utilisé."
+
+---
+
+## Les aveux qui passent bien
+
+Le jury préfère quelqu'un d'honnête à quelqu'un qui invente. Ces phrases montrent ta maturité :
+
+- "C'est une limite de mon projet que j'ai identifiée."
+- "C'est quelque chose que je ferais différemment avec plus d'expérience."
+- "Je comprends le concept mais pas l'implémentation détaillée."
+- "J'ai fait ce choix par simplicité, sachant qu'il existe des alternatives plus robustes."
+- "C'est sur ma liste d'apprentissage."
+
+---
+
+## Ce que tu DOIS savoir expliquer (le minimum)
+
+| Sujet | Tu dois pouvoir dire... |
+|-------|------------------------|
+| **Ton projet** | Ce qu'il fait, pour qui, les fonctionnalités principales |
+| **Ta stack** | Pourquoi Vue, Node, MySQL (même si c'est "c'est ce que j'ai appris") |
+| **L'authentification** | Login → token → stockage → vérification |
+| **La sécurité basique** | Mots de passe hashés, requêtes préparées |
+| **Tes tests** | Pourquoi tu testes, combien tu en as, ce qu'ils vérifient |
+| **Ta plus grosse difficulté** | Ce qui t'a bloqué et comment tu l'as résolu |
+
+---
+
+## Exemple de réponse complète (modèle)
+
+**Question :** "Expliquez comment fonctionne l'authentification dans votre application."
+
+**Bonne réponse (niveau débutant) :**
+
+> "Quand un utilisateur se connecte, il envoie son email et mot de passe. Mon serveur vérifie que l'email existe et que le mot de passe correspond — je compare le hash, pas le mot de passe en clair. Si c'est bon, je génère un token JWT qui contient l'id et le rôle de l'utilisateur.
+>
+> Ce token est renvoyé au frontend qui le stocke dans localStorage. À chaque requête vers l'API, le frontend ajoute ce token dans les headers. Côté serveur, mon middleware vérifie que le token est valide avant d'autoriser l'accès.
+>
+> Je sais que localStorage n'est pas la méthode la plus sécurisée — les cookies HttpOnly seraient mieux — mais c'est ce que j'ai appris et ça fonctionne pour ce projet."
+
+**Pourquoi c'est bien :**
+- Tu expliques le flux simplement
+- Tu montres que tu comprends ce que tu as fait
+- Tu avoues une limite sans t'excuser
+- Tu ne prétends pas tout maîtriser
+
+---
+
+## Derniers conseils
+
+1. **Respire** — C'est normal de ne pas tout savoir
+2. **Prends ton temps** — Mieux vaut réfléchir que dire n'importe quoi
+3. **Reformule** — "Si je comprends bien votre question..."
+4. **Montre ton code** — "Je peux vous montrer dans le code si vous voulez"
+5. **Sois toi-même** — Le jury sait que tu es junior
+
+---
+
+# AUTRES CONCEPTS EXPLIQUÉS SIMPLEMENT
+
+## C'est quoi CORS ?
+
+**Explication simple :**
+C'est comme un videur qui vérifie si tu viens du bon quartier.
+
+Par défaut, un site web ne peut pas appeler un serveur sur un autre domaine. C'est une protection du navigateur.
+
+- Mon site est sur `localhost:5173`
+- Mon API est sur `localhost:3000`
+- Ce sont deux "quartiers" différents → bloqué par défaut
+
+**Solution :** Je dis à mon serveur "Accepte les demandes qui viennent de localhost:5173".
+
+---
+
+## C'est quoi bcrypt ?
+
+**Explication simple :**
+C'est une machine à crypter les mots de passe.
+
+- Tu mets le mot de passe dedans
+- Ça ressort un truc illisible (le hash)
+- Impossible de revenir en arrière
+- Même mot de passe = hash différent à chaque fois (grâce au salt)
+
+**Le "10 rounds"** : C'est le nombre de fois que la machine "mélange". Plus c'est haut, plus c'est sécurisé mais plus c'est lent.
+
+---
+
+## C'est quoi Axios ?
+
+**Explication simple :**
+C'est un facteur qui envoie et reçoit des lettres pour moi.
+
+Au lieu d'écrire moi-même tout le code pour envoyer une requête HTTP, j'utilise Axios qui fait ça pour moi plus simplement.
+
+```javascript
+// Sans Axios (compliqué)
+fetch('/api/quizzes', {
+  method: 'GET',
+  headers: { 'Authorization': 'Bearer ' + token }
+}).then(res => res.json()).then(data => ...)
+
+// Avec Axios (simple)
+axios.get('/api/quizzes')
+```
+
+---
+
+## C'est quoi Tailwind CSS ?
+
+**Explication simple :**
+C'est comme des Legos pour le design.
+
+Au lieu d'écrire du CSS personnalisé, j'utilise des classes toutes faites :
+- `bg-blue-500` = fond bleu
+- `text-white` = texte blanc
+- `p-4` = padding de 4 (espacement intérieur)
+- `rounded` = coins arrondis
+
+**Avantage :** Je n'ai pas besoin de créer un fichier CSS, tout est dans les classes HTML.
+
+---
+
+## C'est quoi Vue Router ?
+
+**Explication simple :**
+C'est le GPS de mon application.
+
+Il dit : "Si l'utilisateur va sur /dashboard, affiche la page Dashboard. Si il va sur /login, affiche la page Login."
+
+**Les guards :** Ce sont des barrières. Avant d'aller sur /dashboard, je vérifie que l'utilisateur est connecté. Sinon, je le renvoie vers /login.
+
+---
+
+## C'est quoi un composant Vue ?
+
+**Explication simple :**
+C'est un morceau de page réutilisable.
+
+Imagine une carte de quiz. Plutôt que de recopier le code 10 fois pour 10 quiz, je crée UN composant `QuizCard` et je l'utilise 10 fois.
+
+```
+┌─────────────┐  ┌─────────────┐  ┌─────────────┐
+│  QuizCard   │  │  QuizCard   │  │  QuizCard   │
+│  Quiz 1     │  │  Quiz 2     │  │  Quiz 3     │
+└─────────────┘  └─────────────┘  └─────────────┘
+
+→ 1 seul code, utilisé 3 fois
+```
+
+---
+
+## C'est quoi async/await ?
+
+**Explication simple :**
+C'est une façon d'attendre qu'une tâche soit finie avant de continuer.
+
+**Sans async/await :**
+```javascript
+// Je commande un café, mais je n'attends pas qu'il soit prêt
+commander()
+boire() // J'essaie de boire alors que le café n'est pas prêt !
+```
+
+**Avec async/await :**
+```javascript
+// J'attends que le café soit prêt avant de boire
+await commander()
+boire() // Le café est prêt, je peux boire
+```
+
+---
+
+## C'est quoi le .env ?
+
+**Explication simple :**
+C'est un coffre-fort pour mes secrets.
+
+Je ne mets jamais mes mots de passe ou clés API directement dans le code. Je les mets dans un fichier `.env` qui n'est JAMAIS envoyé sur GitHub.
+
+```
+DB_PASSWORD=monsupermotdepasse
+JWT_SECRET=maclesecrete
+STRIPE_KEY=sk_test_xxx
+```
+
+**Dans le code :** Je lis ces valeurs avec `process.env.DB_PASSWORD`
+
+---
+
+## C'est quoi npm ?
+
+**Explication simple :**
+C'est un supermarché de code.
+
+Plutôt que de tout coder moi-même, je "fais mes courses" et j'installe des packages déjà faits :
+- `express` pour créer mon serveur
+- `bcrypt` pour crypter les mots de passe
+- `axios` pour faire des requêtes HTTP
+
+**Commandes :**
+- `npm install` = Je remplis mon panier (installation)
+- `npm run dev` = Je lance mon projet
+- `npm test` = Je lance les tests
+
+---
+
+## C'est quoi Git ?
+
+**Explication simple :**
+C'est une machine à remonter le temps pour ton code.
+
+À chaque "commit", je sauvegarde une version de mon code. Si je casse tout, je peux revenir en arrière.
+
+**Commandes simples :**
+- `git add .` = Je prépare mes changements
+- `git commit -m "message"` = Je sauvegarde avec un commentaire
+- `git push` = J'envoie sur GitHub
+- `git pull` = Je récupère les changements
+
+---
+
+## C'est quoi GitHub ?
+
+**Explication simple :**
+C'est un cloud pour stocker mon code.
+
+- Mon code est sauvegardé en ligne
+- Je peux y accéder de n'importe où
+- D'autres personnes peuvent voir mon code (si public)
+- GitHub Actions lance des vérifications automatiques
+
+---
+
+## C'est quoi ESLint ?
+
+**Explication simple :**
+C'est un correcteur orthographique pour le code.
+
+Il me dit : "Attention, tu as une variable que tu n'utilises pas" ou "Tu as oublié un point-virgule".
+
+**Ça ne corrige pas les bugs**, ça corrige les erreurs de style et les oublis.
+
+---
+
+## C'est quoi Prettier ?
+
+**Explication simple :**
+C'est un coiffeur pour le code.
+
+Il remet tout le code en forme automatiquement :
+- Bonne indentation
+- Guillemets cohérents
+- Espaces au bon endroit
+
+**ESLint vs Prettier :**
+- ESLint = Vérifie les erreurs (qualité)
+- Prettier = Remet en forme (apparence)
+
+---
+
+## C'est quoi Vitest ?
+
+**Explication simple :**
+C'est l'outil qui lance mes tests automatiquement.
+
+J'écris mes tests, et Vitest les exécute et me dit lesquels passent (vert) ou échouent (rouge).
+
+---
+
+## C'est quoi Vite ?
+
+**Explication simple :**
+C'est le moteur de mon site en développement.
+
+Quand je tape `npm run dev`, Vite démarre un serveur local et affiche mon site. Quand je modifie un fichier, la page se met à jour automatiquement.
+
+**Vite vs Webpack :** Vite est plus récent et beaucoup plus rapide.
+
+---
+
+# QUESTIONS SUPPLÉMENTAIRES DU JURY
+
+## Sur ton parcours
+
+### "Pourquoi le développement web ?"
+
+**Réponse possible :**
+> "J'ai toujours aimé créer des choses. Le développement web me permet de créer des applications que les gens peuvent utiliser. J'aime le côté concret : je code quelque chose, je vois le résultat immédiatement."
+
+---
+
+### "Qu'est-ce qui t'a le plus plu dans ce projet ?"
+
+**Réponse possible :**
+> "Voir l'application fonctionner de bout en bout. Partir de rien et arriver à une application où quelqu'un peut vraiment créer un quiz et le faire passer à d'autres personnes. C'est gratifiant de voir que ça marche."
+
+---
+
+### "Qu'est-ce qui t'a le plus frustré ?"
+
+**Réponse possible :**
+> "Les bugs qui prennent des heures à trouver alors que c'était une erreur toute bête. Ça m'a appris à mieux lire les messages d'erreur et à tester plus souvent."
+
+---
+
+## Sur le code
+
+### "Montre-moi un bout de code dont tu es fier"
+
+**Ce que tu peux montrer :**
+- Le middleware d'authentification
+- La création de quiz avec vérification de limite
+- Un composant Vue avec sa logique
+
+**Ce que tu dis :**
+> "Ce code vérifie que l'utilisateur est connecté avant d'accéder à une route. C'est simple mais c'est la base de toute la sécurité de l'application."
+
+---
+
+### "Montre-moi un bout de code que tu améliorerais"
+
+**Réponse honnête :**
+> "Il y a des endroits où j'ai répété du code. Par exemple, la gestion des erreurs pourrait être centralisée dans une fonction utilitaire au lieu d'être copiée-collée. Avec plus d'expérience, je ferais ça mieux."
+
+---
+
+### "Comment tu débugues quand quelque chose ne marche pas ?"
+
+**Réponse simple :**
+> "D'abord je lis le message d'erreur. Ensuite j'utilise console.log pour voir ce qui se passe à chaque étape. Si je ne trouve pas, je cherche l'erreur sur Google ou Stack Overflow."
+
+---
+
+## Sur les choix techniques
+
+### "Pourquoi Vue plutôt que React ?"
+
+**Réponse honnête :**
+> "C'est ce qu'on m'a enseigné en formation. J'ai appris Vue et je me suis senti à l'aise avec. Je sais que React est aussi très populaire, mais je n'ai pas encore eu l'occasion de l'apprendre."
+
+---
+
+### "Pourquoi MySQL plutôt que MongoDB ?"
+
+**Réponse simple :**
+> "Mes données sont structurées et ont des relations entre elles : un utilisateur a des quiz, un quiz a des questions. MySQL est fait pour ça. MongoDB serait mieux pour des données plus flexibles, sans relations fixes."
+
+---
+
+### "Pourquoi Express et pas Fastify ou NestJS ?"
+
+**Réponse honnête :**
+> "Express est le framework que j'ai appris. C'est le plus utilisé et il y a beaucoup de documentation. Je sais que Fastify est plus rapide et NestJS plus structuré, mais je ne les connais pas encore."
+
+---
+
+## Sur la sécurité
+
+### "Ton application est-elle sécurisée ?"
+
+**Réponse équilibrée :**
+> "J'ai implémenté les bases de la sécurité : mots de passe hashés avec bcrypt, requêtes préparées contre les injections SQL, tokens JWT pour l'authentification, et Helmet pour les headers de sécurité.
+>
+> Mais il y a des choses que je n'ai pas faites : rate limiting contre le brute force, HTTPS en production, refresh tokens. Pour une vraie mise en production, il faudrait ajouter ces éléments."
+
+---
+
+### "Comment tu protèges les données des utilisateurs ?"
+
+**Réponse simple :**
+> "Les mots de passe sont hashés, donc même moi je ne peux pas les lire. Les données sensibles comme les clés API sont dans un fichier .env qui n'est pas sur GitHub. Et j'utilise des requêtes préparées pour éviter les injections SQL."
+
+---
+
+## Sur les tests
+
+### "Pourquoi tu as écrit des tests ?"
+
+**Réponse simple :**
+> "Pour être sûr que mon code fonctionne, et surtout pour ne pas casser ce qui marchait quand je modifie quelque chose. C'est un filet de sécurité."
+
+---
+
+### "Tu as 199 tests, c'est beaucoup. Ils testent quoi ?"
+
+**Réponse :**
+> "Côté backend, je teste les routes API : est-ce que l'inscription fonctionne, est-ce qu'on peut créer un quiz, est-ce qu'un utilisateur non connecté est bien bloqué.
+>
+> Côté frontend, je teste les composants : est-ce que le bon texte s'affiche, est-ce que les clics déclenchent les bonnes actions, est-ce que les stores gèrent bien les données."
+
+---
+
+## Sur le projet
+
+### "Si tu avais 2 semaines de plus, que ferais-tu ?"
+
+**Réponse :**
+> "J'ajouterais un timer pour les questions, comme ça le quiz serait plus dynamique. Et je ferais des tests end-to-end avec Cypress pour tester le parcours utilisateur complet."
+
+---
+
+### "C'est quoi le MVP ?"
+
+**Explication simple :**
+> "MVP veut dire Minimum Viable Product. C'est la version minimale de l'application qui fonctionne. Mon MVP c'est : un prof peut créer un quiz, un élève peut le passer, on voit le score. Tout le reste (timer, statistiques avancées, multijoueur) c'est pour plus tard."
+
+---
+
+### "Tu as travaillé seul. Comment tu t'es organisé ?"
+
+**Réponse :**
+> "J'ai découpé le projet en étapes : d'abord la base de données, puis l'authentification, puis les quiz, puis les tests. Je faisais une fonctionnalité à la fois et je testais avant de passer à la suivante."
+
+---
+
+# VOCABULAIRE À CONNAÎTRE
+
+| Terme | Définition simple |
+|-------|-------------------|
+| **API** | Interface pour que deux logiciels communiquent |
+| **REST** | Style d'architecture pour les API (utilise GET, POST, PUT, DELETE) |
+| **JWT** | Token d'authentification (comme un badge) |
+| **Hash** | Transformation irréversible (pour les mots de passe) |
+| **Middleware** | Fonction qui s'exécute avant le code principal |
+| **CRUD** | Create, Read, Update, Delete (les 4 opérations de base) |
+| **SPA** | Single Page Application (le site ne recharge jamais) |
+| **Responsive** | S'adapte à toutes les tailles d'écran |
+| **Frontend** | Ce que l'utilisateur voit (le site) |
+| **Backend** | Le serveur qui traite les données |
+| **BDD** | Base de données |
+| **Endpoint** | URL d'une route API |
+| **Token** | Jeton d'authentification |
+| **Store** | Endroit où on stocke les données partagées (Pinia) |
+| **Composant** | Morceau de page réutilisable (Vue) |
+| **Route** | URL et ce qui s'affiche dessus |
+| **Guard** | Protection sur une route (vérifie si connecté) |
+| **Webhook** | URL appelée automatiquement par un service externe |
+| **CI/CD** | Vérifications et déploiement automatiques |
+| **Lint** | Vérification de la qualité du code |
+| **Build** | Compilation du code pour la production |
+
+---
+
+# ANTI-SÈCHE RAPIDE (À RELIRE AVANT LE JURY)
+
+## Ce que fait mon application
+- Les profs créent des quiz (QCM, Vrai/Faux)
+- Les élèves rejoignent avec un code et passent le quiz
+- On voit les scores et résultats
+- Version gratuite (1 quiz) et Premium (20 quiz, 9.99€)
+
+## Ma stack
+- **Frontend** : Vue.js 3, Pinia, Tailwind CSS
+- **Backend** : Node.js, Express.js
+- **BDD** : MySQL
+- **Tests** : Vitest (199 tests)
+- **CI/CD** : GitHub Actions
+
+## Sécurité que j'ai faite
+- Mots de passe hashés (bcrypt)
+- Requêtes préparées (anti-injection SQL)
+- JWT pour l'authentification
+- Helmet pour les headers HTTP
+
+## Sécurité que je n'ai pas faite
+- Rate limiting
+- HTTPS (seulement en local)
+- Refresh tokens
+- Cookies HttpOnly
+
+## Ma plus grande difficulté
+Les webhooks Stripe : comprendre le flux asynchrone et comment vérifier la signature.
+
+## Ce que je ferais en V2
+- TypeScript
+- Timer par question
+- Mode multijoueur
+- Application mobile
+
+## Chiffres à retenir
+- 199 tests
+- 5 tables en BDD
+- 2 rôles (prof, élève)
+- 9.99€ le Premium

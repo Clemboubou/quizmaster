@@ -19,7 +19,7 @@ const adminRoutes = require('./routes/admin.routes')
 const app = express()
 const PORT = process.env.PORT || 3000
 
-// Middleware Helmet pour la securite (avec config pour Swagger)
+// Middleware Helmet pour la securite
 app.use(
     helmet({
         contentSecurityPolicy: {
