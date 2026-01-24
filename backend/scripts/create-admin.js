@@ -30,8 +30,8 @@ async function createAdmin(email, password) {
 
         // Creer l'admin
         const [result] = await pool.query(
-            `INSERT INTO users (email, password, role, is_premium, is_active)
-             VALUES (?, ?, 'admin', true, true)`,
+            `INSERT INTO users (email, password, role, is_premium)
+             VALUES (?, ?, 'admin', true)`,
             [email, hashedPassword]
         )
 

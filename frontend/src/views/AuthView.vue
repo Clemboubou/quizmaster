@@ -48,12 +48,26 @@ async function handleSubmit() {
       await authStore.register(email.value, password.value, role.value)
     }
 
-    router.push(authStore.isProf ? '/dashboard' : '/')
+    // Redirection selon le role
+    if (authStore.isAdmin) {
+      router.push('/admin')
+    } else if (authStore.isProf) {
+      router.push('/dashboard')
+    } else {
+      router.push('/')
+    }
   } catch (err) {
     error.value = err.response?.data?.error?.message || 'Une erreur est survenue'
   } finally {
     loading.value = false
   }
+}
+
+// Connexion rapide avec un compte de test
+async function quickLogin(testEmail, testPassword) {
+  email.value = testEmail
+  password.value = testPassword
+  await handleSubmit()
 }
 
 function toggleMode() {
@@ -196,6 +210,37 @@ function toggleMode() {
           >
             {{ isLogin ? "Pas encore de compte ? S'inscrire" : 'Deja un compte ? Se connecter' }}
           </button>
+        </div>
+
+        <!-- Connexion rapide (dev) -->
+        <div v-if="isLogin" class="mt-6 pt-6 border-t border-gray-200">
+          <p class="text-xs text-gray-500 text-center mb-3">Connexion rapide (dev)</p>
+          <div class="flex flex-wrap gap-2 justify-center">
+            <button
+              type="button"
+              class="px-3 py-1.5 text-xs rounded-full bg-red-100 text-red-700 hover:bg-red-200 transition-colors"
+              :disabled="loading"
+              @click="quickLogin('admin@quizmaster.com', 'Admin123!')"
+            >
+              Admin
+            </button>
+            <button
+              type="button"
+              class="px-3 py-1.5 text-xs rounded-full bg-blue-100 text-blue-700 hover:bg-blue-200 transition-colors"
+              :disabled="loading"
+              @click="quickLogin('prof@test.com', 'Test1234!')"
+            >
+              Prof
+            </button>
+            <button
+              type="button"
+              class="px-3 py-1.5 text-xs rounded-full bg-green-100 text-green-700 hover:bg-green-200 transition-colors"
+              :disabled="loading"
+              @click="quickLogin('clement.bou57@gmail.com', 'Spaderman57')"
+            >
+              Eleve
+            </button>
+          </div>
         </div>
       </div>
     </div>
