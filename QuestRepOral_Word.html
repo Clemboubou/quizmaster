@@ -229,6 +229,23 @@
 <p class="question">Si les tests échouent, que se passe-t-il ?</p>
 <p class="reponse">"Le pipeline s'arrête et je suis notifié. Le code ne peut pas être mergé tant que les tests ne passent pas."</p>
 
+<h2>SLIDES 18-19 – RGPD</h2>
+
+<p class="question">Pourquoi tu n'as pas tout fait dès le début ?</p>
+<p class="reponse">"C'est un projet pédagogique avec un scope MVP. J'ai priorisé la sécurité technique qui est le cœur du projet : bcrypt, JWT, protection contre l'injection SQL. Les documents utilisateur comme la politique de confidentialité sont moins prioritaires pour la démonstration technique, mais j'ai documenté exactement ce qu'il faut ajouter. Dans un vrai contexte professionnel, je ferais ça avant le premier déploiement public."</p>
+
+<p class="question">C'est quoi la différence entre donnée personnelle et sensible ?</p>
+<p class="reponse">"Une donnée personnelle, c'est toute info qui permet d'identifier quelqu'un - l'email, un ID, une IP. Une donnée sensible, c'est une catégorie spéciale ultra-protégée : santé, religion, orientation sexuelle, origine raciale, opinions politiques. Ces données sensibles sont interdites de traitement sauf exceptions strictes. Dans QuizMaster, je n'ai QUE des données personnelles basiques, pas de sensibles."</p>
+
+<p class="question">C'est quoi une base légale ?</p>
+<p class="reponse">"Le RGPD dit qu'on ne peut PAS traiter des données sans justification. Il y a 6 bases légales possibles. Dans QuizMaster j'en utilise 3 : le consentement quand l'utilisateur s'inscrit, l'exécution du contrat pour le paiement Stripe, et l'intérêt légitime pour les logs de sécurité. Sans au moins une de ces bases, le traitement est illégal."</p>
+
+<p class="question">Et si tu as une fuite de données ?</p>
+<p class="reponse">"J'ai 72 heures pour notifier la CNIL si la fuite présente un risque pour les utilisateurs. Je dois documenter l'incident, identifier les données concernées, corriger la faille, et si le risque est élevé, prévenir aussi les utilisateurs directement. Actuellement j'ai des logs qui tracent les actions, mais en prod j'ajouterais un système d'alerting automatique et un plan de réponse incident écrit."</p>
+
+<p class="question">Stripe est un sous-traitant ?</p>
+<p class="reponse">"Oui. Moi je suis responsable de traitement car je décide quelles données collecter et pourquoi. Stripe est sous-traitant car il traite les paiements sur mes instructions. Juridiquement, même si Stripe a une faille, je reste responsable devant la CNIL. C'est pour ça qu'il faut signer un DPA - Data Processing Agreement - avec eux."</p>
+
 <h1>QUESTIONS PIÈGES TECHNIQUES</h1>
 
 <h2>JavaScript / Node.js</h2>

@@ -17,11 +17,11 @@ async function startCheckout() {
   error.value = ''
 
   try {
-    const response = await api.post('/payment/create-checkout')
+    const response = await api.post('/payments/create-checkout')
 
     // Redirect to Stripe Checkout
-    if (response.data.data.url) {
-      window.location.href = response.data.data.url
+    if (response.data.data.checkout_url) {
+      window.location.href = response.data.data.checkout_url
     }
   } catch (err) {
     error.value = err.response?.data?.error?.message || 'Erreur lors de la creation du paiement'

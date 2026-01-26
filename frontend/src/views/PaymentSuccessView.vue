@@ -23,7 +23,7 @@ onMounted(async () => {
 
   try {
     // Verify payment with backend
-    await api.get(`/payment/success?session_id=${sessionId}`)
+    await api.get(`/payments/success?session_id=${sessionId}`)
 
     // Refresh user data to get updated premium status
     await authStore.fetchUser()

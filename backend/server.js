@@ -19,10 +19,14 @@ const adminRoutes = require('./routes/admin.routes')
 const app = express()
 const PORT = process.env.PORT || 3000
 
+// Nettoyer FRONTEND_URL (enlever le slash final si present)
+const FRONTEND_URL = process.env.FRONTEND_URL?.replace(/\/+$/, '')
+
 // Middleware Helmet pour la securite
+// En developpement, on desactive CSP car Vue.js utilise eval() pour le hot reload
 app.use(
     helmet({
-        contentSecurityPolicy: {
+        contentSecurityPolicy: process.env.NODE_ENV === 'development' ? false : {
             directives: {
                 defaultSrc: ["'self'"],
                 styleSrc: ["'self'", "'unsafe-inline'"],
@@ -36,7 +40,7 @@ app.use(
 // Configuration CORS
 app.use(
     cors({
-        origin: process.env.FRONTEND_URL
+        origin: FRONTEND_URL
     })
 )
 
